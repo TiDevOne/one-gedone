@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+{% load static %}
+
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'bootstrap/css/tela_login.css' %}"> <!-- Adicione o caminho correto para o arquivo CSS do Bootstrap -->
+  <link rel="stylesheet" href="{% static 'bootstrap/images/AEGEA/logo/logo-branco.png' %}">
+  <!--script src="https://www.google.com/recaptcha/api.js" async defer></script-->
+  <script src='{% static "bootstrap/js/src/tela_login.js" %}'></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+  <!-- Estrutura da caixa de login -->
+  <div class="login-box">
+    <!-- Logotipo na caixa de login -->
+    <img src="{% static 'bootstrap/images/AEGEA/logo/logo-branco.png' %}" alt="Logo">
+    <!-- Título "Login" na caixa de login -->
+    <h2>Login</h2>
+    <!-- Formulário de login -->
+    <form method="post" action="{% url 'login' %}">
+  <!-- Campo de entrada para o nome de usuário -->
+  <div class="user-box">
+    <input type="text" name="username" required>
+    <label>Usuário:</label>
+  </div>
+  <!-- Campo de entrada para a senha -->
+  <div class="user-box">
+    <input type="password" name="password" required>
+    <label>Senha:</label>
+  </div>
+  <!-- Botão de acesso -->
+  <a href="#">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  <button type="submit">Acessar</button>
+  </a>
+  <!-- Frase "Esqueci minha senha" com link -->
+  <p href="#" id="forgot-password">Esqueci minha senha</p>
+  <div class="g-recaptcha" data-sitekey="SEU_SITE_KEY"></div>
+</form>
+
+    </div>
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Recuperação de senha</h2>
+        <input type="text" id="cpf" placeholder="Informe CPF Cadastrado">
+        <input type="text" id="email" placeholder="Informe E-mail Cadastrado">
+        <button id="submit">Enviar</button>
+      </div>
+    </div>
+    <!--
+    <div class="Termo">
+    Ao entrar no Ged One, você concorda com os nossos <br>Termos e
+     <b>Política de Privacidade.</b><br>
+    Este site é protegido pela reCAPTCHA Enterprise. Aplicam-se a 
+    <a href="https://policies.google.com/privacy">Política de Privacidade</a> <br>
+     e os <a href="https://policies.google.com/terms">Termos de Uso</a>
+     </div>
+    -->
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</body>
+</html>

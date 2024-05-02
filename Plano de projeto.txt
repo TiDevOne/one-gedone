@@ -1,0 +1,215 @@
+Tela de Login
+
+Tela de inicio
+
+Tela pesquisa de Dossie
+
+1 - pesquisa de dossie dos colaboradores
+	Os filtros de pesquisa
+	a - Empresa
+	b - Regional
+	c - Unidade
+	d - CPF
+	e - Nome Funcionário
+    f - Matricula
+	g - Situação
+
+
+Tela de Relatórios
+
+2 - relatórios de documentos pendentes
+	Os filtros de pesquisa são
+	a - Empresa
+	b - Regional
+	c - Unidade
+	d - CPF
+	e - Nome Funcionário
+        f - Matricula
+	g - Situação
+        h - Tipo documento
+        i - data Admissão
+	j - desligamento
+	k - Competencia
+
+3 - Relatório documento com alerta de vencimento
+	Os filtros de pesquisa são
+	a - Empresa
+	b - Regional
+
+4 - Relatório Documentos vencidos
+	Os filtros de pesquisa são
+	a - Empresa
+
+5 - Relatório Gerenciamento ASO
+	Funcnionários Ativos
+        Os filtros de pesquisa são
+	a - Empresa
+	b - Regional
+	c - Unidade
+	d - Tipo documento
+	e - Situação
+
+	Funcnionários Inativos
+        Os filtros de pesquisa são
+	a - Empresa
+	b - Regional
+	c - Unidade
+	d - Tipo documento
+	e - Situação
+
+6 - vinculo com BI
+
+7 - Relatório gereciais
+	a - Tipo
+	b - Data dos dados
+
+8 - Envio Manual e-mail
+	a - Destinatário
+	b - Tipo botão de seleção
+	c - Data dos dados
+
+9 - Configuração tipo de documentos (essa parte vai ser alimentada por um xlsx)
+	a - Lista de documentos
+	    Exibe no relatório de compliance
+	    Grupo de documento
+	    Nome
+            Obrigatório
+	    Codigo
+
+10 - Cartão de pontos Inexistentes
+	Os filtros de pesquisa são
+	a - Empresa
+	b - Regional
+	c - Unidade
+	d - Funcionário
+	e - Mês/Ano
+        f - Mês/ Ano final
+
+
+Tela de configurações
+
+1 - Importação de PDF
+	Sincroniza os documentos do servidor com o sistema
+
+2 - Gerar Hyperlink de Documentos PDF
+3 - Importar xlsx com os funcionários
+4 - Importar Gestor
+    xlsx (empresa; regional; unidade; login)
+5 - Área de produção
+ a - Tipo Documento
+ b - Funcionário/Colaborador
+ c - Matrícula
+ d - CPF
+
+6 - Ajuste de Cadastro Funcionário
+	a - Pesquisa funcionário
+	b - Duplicar funcionario
+        c - Adicionar novo funcionario
+        d - Salvar
+	e - Excluir
+	f - Empresa
+	g - Regional
+	h - Unidade
+	i - CR
+	j - matricula
+        k - CPF
+	l - Nome
+	m - Data Admissão
+	n - Cargo
+	o - Situação
+	p - Modo Ponto
+	q - Desligamento
+
+7 - Segurança
+	Usuário
+	    Cadastro de usuários
+            Novo
+	    salvar
+            Excluir
+	    Empresa
+ 	    Regional
+	    Unidade
+	    E-mail
+	    CPF
+	    Telefone
+	    Situação
+	    Tipo de Usuário
+	    Perfil
+ 	    Vincular unidades
+	Alterar senha
+	log da transações
+
+
+Sair
+
+
+
+
+
+Entidades Principais:
+Funcionário:
+
+Empresa
+Regional
+Unidade
+CPF
+Nome Funcionário
+Matrícula
+Situação (ativo, inativo, etc.)
+Data Admissão
+Data Desligamento
+Cargo
+Modo Ponto
+Documento:
+
+Tipo Documento
+Data de Vencimento
+Data de Alerta de Vencimento
+Status (pendente, vencido, etc.)
+Competência
+Grupo de Documento
+Obrigatório
+Código
+Empresa, Regional, Unidade:
+
+Informações gerais sobre a estrutura da organização.
+Usuário:
+
+Nome de usuário
+E-mail
+CPF
+Telefone
+Situação (ativo, inativo)
+Tipo de Usuário
+Perfil (admin, usuário regular, etc.)
+Log de Transações:
+
+Informações sobre cada transação realizada no sistema.
+Relacionamentos:
+Um Funcionário pode ter vários Documentos associados (relacionamento um-para-muitos).
+Empresas, Regionais e Unidades podem ter vários Funcionários associados (relacionamento um-para-muitos).
+Usuários podem ter várias transações no log (relacionamento um-para-muitos).
+Tabelas Adicionais:
+Configuração Tipo Documentos:
+
+Lista de documentos
+Grupo de Documento
+Nome
+Obrigatório
+Código
+Gestor:
+
+Relaciona usuários ao seu papel de gestor em diferentes níveis organizacionais.
+Índices:
+Crie índices para as colunas frequentemente usadas em cláusulas WHERE e JOIN para otimizar as consultas.
+Considerações Adicionais:
+Segurança: Certifique-se de implementar um sistema robusto de controle de acesso e autenticação.
+
+Performance: Monitore e otimize o desempenho do banco de dados à medida que a quantidade de dados aumenta.
+
+Backup e Recuperação: Implemente um sistema de backup regular para proteger os dados contra perdas.
+
+Normalização: Considere a normalização para evitar redundância de dados e garantir a consistência.
+
+Migrações: Planeje para migrações de esquema de banco de dados conforme o sistema evolui.
+

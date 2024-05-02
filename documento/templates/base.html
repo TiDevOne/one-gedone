@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}GED ONE - Gerenciamento Eletrônico de Documentos{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  {% block extra_css %}{% endblock %}
+  {% block extra_js %}{% endblock %}
+</head>
+<body>
+  <header>
+    <!-- Elementos do lado esquerdo -->
+    <div class="quadrado">
+      <img src='{% static "bootstrap/images/AEGEA/logo/RIHAPPY_Logo.png" %}' alt="AEGEA"> <br>
+    </div>
+    <h1>GED ONE - Gerenciamento Eletrônico de Documentos</h1>
+    <div class="Administrador">
+      <p>Administrador: Marcio </p>
+      <span id="dataAtual"></span>
+      <i class="bi bi-person-circle" style="font-size: 40px;"></i>
+    </div>
+  </header>
+
+
+
+<style>
+  
+
+
+
+  *{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Outfit',sans-serif;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+ 
+header {
+  background-color: #723588;
+  color: #ffffff;
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+header img {
+  height: 70px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 14px;
+  max-width: 50%;
+  text-align: center;
+  margin-left: 20%;
+
+}
+
+header p {
+  margin: 0;
+  font-size: 14px;
+  margin-left: 20%;
+}
+
+.subheader {
+  background-color: #FFDD00;
+  color: #ffffff;
+  padding: 0px;
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.448);
+}
+
+
+.subheader button {
+  background-color: #926da0;
+  color: #ffffff;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  margin-right: 0; /* Remover a margem direita para todos os botões */
+  transition: background-color 0.3s ease;
+}
+
+.subheader button:hover {
+  background-color: #bda0c8;
+}
+
+
+
+  
+  .quadrado {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px; /* Defina a largura do quadrado */
+    height: 90%; /* Defina a altura do quadrado para cobrir toda a altura do header */
+    background-color: #ffffff; /* Defina a cor de fundo do quadrado */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Garante que a imagem não ultrapasse os limites do quadrado */
+    border-top-right-radius: 50px; /* Arredonda o canto superior direito */
+    border-bottom-right-radius: 50px; /* Arredonda o canto inferior direito */
+}
+.quadrado img {
+  width: 150px; /* Ajuste o tamanho da largura da imagem conforme necessário */
+  height: auto; /* Mantém a proporção da imagem */
+  object-fit: contain; /* Mantém a proporção da imagem dentro do quadrado */
+}
+
+.loader {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #723588;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: -25px;
+  margin-left: -25px;
+  z-index: 9999;
+  display: none; /* Ocultar inicialmente */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+
+  <div class="subheader">
+    <a href="{% url 'dashboard' %}"><button><span class="Icons3"><i class="bi bi-house" style="font-size: 18px;"></i></span>Inicio</button>
+    <a href="{% url 'dossie' %}"><button><span class="Icons3"><i class="bi bi-folder2-open" style="font-size: 18px;"></i></span>Dossiê</button>
+    <a href="{% url 'relatorios' %}"><button><span class="Icons3"><i class="bi bi-card-list" style="font-size: 18px;"></i></span>Relatórios</button></a>
+    <a href="{% url 'configuracao' %}"><button><span class="Icons3"><i class="bi bi-gear" style="font-size: 18px;"></i></span>Configurações</button></a>
+    <button id="btnSair"><span class="Icons3"><i class="bi bi-power" style="font-size: 18px;"></i></span>Sair</button>
+  </div>
+
+
+    {% block content %}
+    <!-- Aqui é onde o conteúdo específico de cada página será inserido -->
+    {% endblock %}
+
+    <script>
+      document.getElementById('btnSair').addEventListener('click', function() {
+          window.location.href = "{% url 'tela_login' %}";
+      });
+      </script>
+</body>
+
+</html>

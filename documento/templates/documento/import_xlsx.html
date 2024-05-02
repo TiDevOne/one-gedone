@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importar csv</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+        }
+</style>
+</head>
+<body>
+        {% csrf_token %}
+        {{ arquivo.as_p }}
+    <form method="post" enctype="multipart/form-data" action="{% url 'importar-dados' %}">
+
+        <input type="file" name="arquivo_csv" accept=".csv" required>
+
+        <button type="submit">Importar</button>
+
+    </form>
+
+    <div id="mensagens">
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <script>
+        // Script para mostrar/ocultar o campo de desligamento
+        const checkbox = document.querySelector('#opcional');
+        const campoDesligamento = document.querySelector('#desligamento_opcional');
+
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                campoDesligamento.style.display = 'block';
+            } else {
+                campoDesligamento.style.display = 'none';
+            }
+        });
+    </script>
+
+</body>
+
+</html>

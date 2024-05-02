@@ -1,0 +1,806 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href='{% static "\bootstrap\css\dados_pessoais.css" %}'>
+{% endblock %}
+
+
+
+
+{% block content %}
+<div id="info-box"></div>
+
+<div id="pdfViewer" style="width: 800px; height: 600px; margin: auto;"></div>
+
+<div class="loader" id="loader"></div>
+
+  <div class="window">
+    <div class="Titlereturn">
+      <h1>Dossiê</h1>
+      <a href="{% url 'dossie' %}"><button id="returnButton"><i class="bi bi-arrow-left"></i></button> </a>
+    </div>    
+    <div class="header">
+      <div class="title">
+        <h2><div class="colaborador"></div></h2>
+      </div>
+      <div class="columns">
+        <div class="row">
+          <i class="bi bi-person-bounding-box" style="font-size: 80px;"></i>
+        </div>
+        <div class="row">
+          <div class="columnTitle">Regional:</div>
+          <div class="regional"></div>
+        </div>
+        <div class="row">
+          <div class="columnTitle">Unidade:</div>
+          <div class="unidade"></div>
+        </div>
+        <div class="row">
+          <div class="columnTitle">Admissão:</div>
+          <div class="admissao"></div>
+        </div>
+        <div class="row">
+          <div class="columnTitle">Desligamento:</div>
+          <div class="desligamento"></div>
+        </div>
+        <div class="row">
+          <div class="columnTitle">Cargo:</div>
+          <div class="cargo"></div>
+        </div>
+        <div class="row">
+          <div class="columnTitle">Matrícula:</div>
+          <div class="matricula"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="DownloadButton">
+      <button onclick="openModal()">Compliance: <i class="bi bi-circle-fill"></i></button>
+      <button id="BaixarTodos">DOWNLOAD DE TODOS OS DOCUMENTOS</button>
+  </div>
+  
+
+
+
+  <table id="tabela-resultados1">
+    <thead>
+      <tr>
+        <th>Existe</th>
+        <th>Tipo de Documento</th>
+        <th>Obrigatório</th>
+        <th>Registrado</th>
+        <th>Download</th>
+        <th>Visualizar</th>
+        <th>Selecionar</th>
+      </tr>
+      <tr class="table-title">
+        <td colspan="7">
+          <span class="titulo-lado-esquerdo">Admissional</span>
+          <button class="Grupo" id="BaixarAdmissional">Download<p> Admissional</button>
+        </td>
+      </tr>
+    </thead>
+    <tbody id="dados-documentos">
+      <!-- Os resultados serão inseridos aqui -->
+    </tbody>
+  </table>
+
+  
+  <table id="tabela-resultados2">
+    <thead>
+      <tr>
+       
+      </tr>
+      <tr class="table-title">
+        <!-- título da tabela -->
+        <td colspan="7">
+        <span class="titulo-lado-esquerdo">Benefícios</span>
+        <button class="Grupo" id="BaixarBeneficios">Download<p> Benefícios</button>
+        </tr>
+    </thead>
+    <tbody>
+      <!-- Os resultados serão inseridos aqui -->
+    </tbody>
+  </table>
+
+  <table id="tabela-resultados3">
+    <thead>
+      <tr>
+       
+      </tr>
+      <tr class="table-title">
+        <!-- título da tabela -->
+        <td colspan="7">
+          <span class="titulo-lado-esquerdo">Instrumental</span>
+          <button class="Grupo" id="BaixarInstrumental">Download<p> Instrumental</button>
+          </tr>
+    </thead>
+    <tbody>
+      <!-- Os resultados serão inseridos aqui -->
+    </tbody>
+  </table>
+
+  <table id="tabela-resultados4">
+    <thead>
+      <tr>
+       
+      </tr>
+      <tr class="table-title">
+        <!-- título da tabela -->
+        <td colspan="7">
+          <span class="titulo-lado-esquerdo">Saúde/Segurança</span>
+          <button class="Grupo" id="BaixarSaudeSeguranca">Download<p> Saúde/Segurança</button>
+          </tr>
+    </thead>
+    <tbody>
+      <!-- Os resultados serão inseridos aqui -->
+    </tbody>
+  </table>
+
+  <table id="tabela-resultados5">
+    <thead>
+      <tr>
+       
+      </tr>
+      <tr class="table-title">
+        <!-- título da tabela -->
+        <td colspan="7">
+          <span class="titulo-lado-esquerdo">Férias</span>
+          <button class="Grupo" id="BaixarFerias">Download<p> Férias</button>
+          </tr>
+    </thead>
+    <tbody>
+      <!-- Os resultados serão inseridos aqui -->
+    </tbody>
+  </table>
+
+  <table id="tabela-resultados6">
+    <thead>
+      <tr>
+       
+      </tr>
+      <tr class="table-title">
+        <!-- título da tabela -->
+        <td colspan="7">
+          <span class="titulo-lado-esquerdo">Horas</span>
+          <button class="Grupo" id="BaixarHoras">Download<p> Horas</button>
+          </tr>
+    </thead>
+    <tbody>
+      <!-- Os resultados serão inseridos aqui -->
+    </tbody>
+  </table>
+
+  <table id="tabela-resultados7">
+    <thead>
+      <tr>
+       
+      </tr>
+      <tr class="table-title">
+        <!-- título da tabela -->
+        <td colspan="7">
+          <span class="titulo-lado-esquerdo">Treinamento/Outros documentos</span>
+          <button class="Grupo" id="BaixarTreinamentoOutrosDocumentos">Download<p> Treinamento/Outros documentos</button>
+          </tr>
+    </thead>
+    <tbody>
+      <!-- Os resultados serão inseridos aqui -->
+    </tbody>
+  </table>
+  
+  
+  <table id="tabela-resultados8">
+    <thead>
+      <tr>
+       
+      </tr>
+      <tr class="table-title">
+        <!-- título da tabela -->
+        <td colspan="7">
+          <span class="titulo-lado-esquerdo">Desligamentos</span>
+          <button class="Grupo" id="BaixarDesligamentos">Download<p> Desligamentos</button>
+          </tr>
+    </thead>
+    <tbody>
+      <!-- Os resultados serão inseridos aqui -->
+    </tbody>
+  </table>
+  
+  
+  <table id="tabela-resultados9">
+    <thead>
+      <tr>
+       
+      </tr>
+      <tr class="table-title">
+        <!-- título da tabela -->
+        <td colspan="7">
+          <span class="titulo-lado-esquerdo">Outros Documentos Diversos</span>
+          <button class="Grupo" id="BaixarOutrosDocumentosDiversos">Download<p> Outros Documentos Diversos</button>
+          </tr>
+    </thead>
+    <tbody>
+      <!-- Os resultados serão inseridos aqui -->
+    </tbody>
+  </table>
+
+
+<!-- Div de descrição -->
+<div id="descricaoDocumento" class="descricao-documento">
+  <div class="descricao-documento-conteudo" id="descricaoDocumentoConteudo">
+    <!-- Conteúdo da descrição do documento -->
+  </div>
+</div>
+
+
+
+<style>
+  .descricao-documento {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(255, 255, 255);
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+}
+
+.descricao-documento-conteudo {
+  text-align: center;
+}
+
+</style>
+
+<script>
+  $(document).ready(function(){
+    // Primeira chamada para obter os dados
+    $.ajax({
+      url: '{% url "get_documentos_info" %}',
+      type: "GET",
+      dataType: "json",
+      success: function(data) {
+        $.each(data, function(index, item) {
+          var obrigatorio = item.obrigatorio ? "Sim" : "Não";
+          var registrado = item.valor_legal ? "Sim" : "Não";
+          var newRow = "<tr>" +
+                       "<td></td>" +
+                       "<td>" + item.nome + "</td>" +
+                       "<td>" + obrigatorio + "</td>" +
+                       "<td>" + registrado + "</td>" +
+                       "<td></td>" +
+                       "<td></td>" +
+                       "<td></td>" +
+                       "</tr>";
+
+          var tableId = ""; // Variável para armazenar o ID da tabela correspondente ao grupo de documento
+
+          switch (item.grupo_documento) {
+            case "Admissão":
+              tableId = "tabela-resultados1";
+              break;
+            case "Benefícios":
+              tableId = "tabela-resultados2";
+              break;
+            case "Instrumental":
+              tableId = "tabela-resultados3";
+              break;
+            case "Saúde/ Segurança":
+              tableId = "tabela-resultados4";
+              break;
+            case "Férias":
+              tableId = "tabela-resultados5";
+              break;
+            case "Horas":
+              tableId = "tabela-resultados6";
+              break;
+            case "Treinamentos e outros Documentos":
+              tableId = "tabela-resultados7";
+              break;
+            case "Desligamento":
+              tableId = "tabela-resultados8";
+              break;
+            case "Diversos":
+              tableId = "tabela-resultados9";
+              break;
+            default:
+              // Se não houver correspondência com nenhum grupo de documento conhecido, não faz nada
+              return;
+          }
+
+          $("#" + tableId + " tbody").append(newRow); // Insere a nova linha na tabela correspondente
+        });
+
+        // Agendando a segunda chamada para verificar o CPF após 200 milissegundos
+        setTimeout(verificarCPF, 200);
+      },
+      error: function(xhr, status, error) {
+        console.error("Erro ao carregar os dados: " + error);
+      }
+    });
+  });
+
+  // Segunda chamada para verificar o CPF
+  function verificarCPF() {
+    // Extrai os parâmetros da URL
+    var params = new URLSearchParams(window.location.search);
+    var cpfRecebido = params.get('cpf');
+
+    // Verifica se o CPF foi recebido
+    if (cpfRecebido) {
+      // Faz uma solicitação AJAX para obter os dados da view get_documentos_info
+      fetch('{% url "get_documentos_info" %}')
+        .then(response => response.json())
+        .then(data => {
+          // Verifica se o CPF recebido existe nos dados
+          var cpfExiste = false;
+          var documentosEncontrados = [];
+          data.forEach(function(tipoDocumento) {
+            tipoDocumento.documentos.forEach(function(documento) {
+              if (documento.cpf === cpfRecebido) {
+                cpfExiste = true;
+                documentosEncontrados.push(documento); // Adiciona o documento encontrado ao array
+              }
+            });
+          });
+
+          // Exibe a notificação correspondente
+          if (cpfExiste) {
+            var mensagem = "Esse CPF recebido existe nos documentos encontrados. E esses são os nomes dos documentos existentes para ele: ";
+            mensagem += documentosEncontrados.map(doc => doc.documento_nome).join(", ");
+            alert(mensagem);
+
+            $(document).ready(function() {
+    $("table tbody tr").each(function() {
+        var existeDocumento = "Não";
+        var tipoDocumento = $(this).find("td:eq(1)").text();
+        var palavraColuna3 = $(this).find("td:eq(3)").text();
+
+        if (documentosEncontrados.some(doc => doc.documento_nome === tipoDocumento)) {
+            existeDocumento = "Sim";
+            var caminhosDocumentos = documentosEncontrados.filter(doc => doc.documento_nome === tipoDocumento).map(doc => doc.caminho);
+
+            $(this).find("td:eq(4)").html('<i class="bi bi-cloud-arrow-down-fill"></i>');
+            $(this).find("td:eq(5)").html('<i class="bi bi-eye" data-documentos-caminho=\'' + JSON.stringify(caminhosDocumentos) + '\'></i>');
+            $(this).find("td:eq(6)").html('<input type="checkbox" style="width: 20px; height: 20px;">');
+        }
+
+        if (existeDocumento === "Não" && palavraColuna3 === "Sim") {
+            $(this).css('background-color', '#f8d7da');
+            $('#documentos-list').append('<li>' + tipoDocumento + '</li>');
+        }
+
+        $(this).find("td:eq(0)").text(existeDocumento);
+    });
+
+    var totalLinhas = $("table tbody tr").length;
+    var totalSimColuna3 = $("table tbody tr td:eq(3):contains('Sim')").length;
+
+    var porcentagemSim = (totalSimColuna3 / totalLinhas) * 100;
+
+    var corIcone;
+    var conteudoCard;
+
+    if (porcentagemSim === 100) {
+        corIcone = '#008000'; // Verde
+        conteudoCard = `
+            <img src="{% static 'bootstrap/images/AEGEA/logo/solzinho.png' %}" alt="AEGEA" width="300" height="300">
+            <p>Mapemaneto completo da sua organização!</p>
+            <p>Documentos desse colaborador está Completo</p>
+            <h1 style="color: #008000;">PARABÉNS!</h1>
+        `;
+    } else if (porcentagemSim >= 50) {
+        corIcone = '#ffa500'; // Laranja
+        conteudoCard = `
+            <img src="{% static 'bootstrap/images/AEGEA/logo/solzinho.png' %}" alt="AEGEA" width="300" height="300">
+            <p>Mapemaneto completo da sua organização!</p>
+            <p>Contém Alguns Documentos importantes desse colaborador esta em falta</p>
+            <h1 style="color: #ffa500;">Quase lá!</h1>
+        `;
+    } else {
+        corIcone = '#ff0000'; // Vermelho
+        conteudoCard = `
+            <img src="{% static 'bootstrap/images/AEGEA/logo/solzinho.png' %}" alt="AEGEA" width="300" height="300">
+            <p>Mapemaneto completo da sua organização!</p>
+            <p>Vários Documentos importantes desse colaborador esta em falta</p>
+            <h1 style="color: #ff0000;">Cuidado!</h1>
+        `;
+    }
+
+    $("button").find(".bi-circle-fill").css('color', corIcone);
+    $(".card1").html(conteudoCard);
+});
+
+
+          } else {
+            alert("Esse CPF recebido não existe nos documentos encontrados.");
+          }
+        })
+        .catch(error => {
+          console.error('Houve um erro na solicitação AJAX:', error);
+          alert('Houve um erro na solicitação AJAX. Por favor, tente novamente.');
+        });
+    } else {
+      // Caso o CPF não tenha sido recebido
+      alert("CPF não recebido na URL.");
+    }
+  }
+
+  
+  $(document).ready(function() {
+    // Código existente para manipulação de documentos...
+
+    $("table").on("click", "input[type='checkbox']", function() {
+        var documentosSelecionados = [];
+        $("table tbody tr input[type='checkbox']:checked").each(function() {
+            var caminhoDocumento = $(this).closest("tr").find(".bi-eye").data('documentos-caminho');
+            documentosSelecionados.push(caminhoDocumento);
+        });
+
+        if (documentosSelecionados.length > 0) {
+            var mensagem = "Quantidade de documentos: " + documentosSelecionados.length + ".";
+            mensagem += "<br><button id='downloadAll'>Sim, baixar todos</button> <button id='cancel'>Cancelar</button>";
+            $('#info-box').html(mensagem).show();
+
+            $('#downloadAll').on('click', function() {
+                documentosSelecionados.forEach(function(documento) {
+                    fetch(documento)
+                        .then(response => response.blob()) // Converte a resposta em um Blob
+                        .then(blob => {
+                            var url = window.URL.createObjectURL(blob);
+                            var a = document.createElement('a');
+                            a.href = url;
+                            a.download = '';  // O atributo download pode ser vazio ou definido com um nome de arquivo específico
+                            a.style.display = 'none';  // Esconde o elemento para que não interfira visualmente
+                            document.body.appendChild(a);
+                            a.click();  // Simula um clique no link para iniciar o download
+                            window.URL.revokeObjectURL(url);  // Libera o URL do objeto
+                            document.body.removeChild(a);  // Remove o elemento do DOM após o clique
+                        })
+                        .catch(e => console.error('Error in downloading file: ', e));
+                });
+                $('#info-box').hide();
+            });
+
+            $('#cancel').on('click', function() {
+                $('#info-box').hide();
+            });
+        } else {
+            $('#info-box').hide(); // Oculta a janela se nenhum checkbox estiver selecionado
+        }
+    });
+
+    // Código para verificarCPF e outras funções aqui...
+});
+
+//função para selecionar grupos de checkbox
+$(document).ready(function() {
+    // Função para marcar todos os checkboxes
+    function marcarTodosCheckboxes() {
+        $('#tabela-resultados1 tbody input[type="checkbox"]').prop('checked', true);
+    }
+
+    $('#BaixarAdmissional').click(marcarTodosCheckboxes);
+    $('#BaixarBeneficios').click(marcarTodosCheckboxes);
+    $('#BaixarInstrumental').click(marcarTodosCheckboxes);
+    $('#BaixarSaudeSeguranca').click(marcarTodosCheckboxes);
+    $('#BaixarFerias').click(marcarTodosCheckboxes);
+    $('#BaixarHoras').click(marcarTodosCheckboxes);
+    $('#BaixarTreinamentoOutrosDocumentos').click(marcarTodosCheckboxes);
+    $('#BaixarDesligamentos').click(marcarTodosCheckboxes);
+    $('#BaixarOutrosDocumentosDiversos').click(marcarTodosCheckboxes);
+});
+
+
+
+// Função para abrir a descrição do documento no centro da página
+function abrirDescricaoDocumento(tipoDocumento, caminhosDocumentos) {
+  $('#descricaoDocumentoConteudo').empty();
+  
+  var header = $('<div>').addClass('descricaoDocumentoHeader').css({
+    'background-color': '#723588',
+    'color': 'white',
+    'display': 'flex',
+    'justify-content': 'space-between',
+    'align-items': 'center',
+    'padding': '10px'
+  });
+  
+  var tituloTipoDocumento = $('<span>').text(tipoDocumento);
+  header.append(tituloTipoDocumento);
+  
+  var btnFechar = $('<button>').attr('id', 'btnFecharDescricao').html('&times;').css({
+    'background': 'none',
+    'border': 'none',
+    'cursor': 'pointer',
+    'color': 'inherit',
+    'font': 'inherit',
+    'padding': 0,
+    'margin': 0,
+    'outline': 'inherit'
+  });
+  header.append(btnFechar);
+  
+  $('#descricaoDocumentoConteudo').append(header);
+  
+  caminhosDocumentos.forEach(function(caminhoDocumento) {
+    var nomeArquivo = caminhoDocumento.split('/').pop();
+    var paragrafo = $('<p>').css('white-space', 'nowrap').text("Nome do documento: " + nomeArquivo + " ");
+    paragrafo.data('caminho-documento', caminhoDocumento); // Adiciona o caminho do documento como atributo de dados
+    var iconeDownload = $('<i>').addClass('bi bi-cloud-arrow-down-fill').text(" ").css({
+      'cursor': 'pointer' // Adiciona estilo de cursor para indicar que é clicável
+    });
+    iconeDownload.click(function() {
+      realizarDownload(caminhoDocumento);
+    });
+    paragrafo.append(iconeDownload);
+    var iconeVisualizacao = $('<i>').addClass('bi bi-eye');
+    paragrafo.append(iconeVisualizacao);
+    $('#descricaoDocumentoConteudo').append(paragrafo);
+  });
+  
+  $('#descricaoDocumento').show();
+}
+
+// Função para realizar o download do arquivo
+function realizarDownload(caminhoDocumento) {
+  // Requisição AJAX para obter o conteúdo do arquivo
+  $.ajax({
+    url: caminhoDocumento,
+    xhrFields: {
+      responseType: 'blob' // Define o tipo de resposta como Blob
+    },
+    success: function(data) {
+      // Cria um objeto Blob com o conteúdo retornado
+      var blob = new Blob([data]);
+      // Cria um URL temporário para o Blob
+      var url = window.URL.createObjectURL(blob);
+      // Cria um link temporário e força o download
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = caminhoDocumento.split('/').pop();
+      link.click();
+      // Libera o URL temporário
+      window.URL.revokeObjectURL(url);
+    }
+  });
+}
+
+
+
+// Função para abrir o link do documento (PDF) com cabeçalho
+function abrirLinkDocumento(caminhoDocumento) {
+  // Extrai o nome do documento do caminho
+  var nomeDocumento = caminhoDocumento.split('_')[1];
+  nomeDocumento = nomeDocumento.split('.')[0]; // Remove a extensão do arquivo
+
+  // Define o tamanho da div
+  var largura = 900;
+  var altura = 600;
+
+  // Cria um cabeçalho com o nome do documento e o botão de fechar
+  var header = $('<div>').addClass('documentoHeader').css({
+    'background-color': '#723588',
+    'color': 'white',
+    'padding': '10px',
+    'text-align': 'center',
+    'font-size': '20px',
+    'position': 'relative' // Para posicionar corretamente o botão de fechar
+  }).text(nomeDocumento);
+
+  // Botão de fechar
+  var btnFechar = $('<button>').text('X').css({
+    'position': 'absolute',
+    'top': '5px',
+    'right': '5px',
+    'background': 'none',
+    'border': 'none',
+    'cursor': 'pointer',
+    'color': 'inherit',
+    'font': 'inherit',
+    'padding': 0,
+    'margin': 0,
+    'outline': 'inherit'
+  }).click(function() {
+    // Função para fechar a exibição do documento ao clicar no botão de fechar
+    fecharDocumentoCompleto(); // Corrigindo para chamar fecharDocumentoCompleto
+  });
+  header.append(btnFechar);
+
+  // Cria um elemento <iframe> para carregar o PDF dentro da div
+  var iframe = $('<iframe>').attr('src', caminhoDocumento).css({
+    'width': largura + 'px',
+    'height': altura + 'px',
+    'border': 'none'
+  });
+
+  // Centraliza a div na página
+  var divDocumento = $('<div>').addClass('documentoContainer').css({ // Adicionando classe documentoContainer
+    'position': 'fixed',
+    'top': '50%',
+    'left': '50%',
+    'transform': 'translate(-50%, -50%)',
+    'z-index': '9999',
+    'background-color': 'white',
+    'border': '1px solid #ccc',
+    'border-radius': '5px',
+    'box-shadow': '0px 0px 10px rgba(0, 0, 0, 0.5)',
+    'overflow': 'hidden'
+  }).append(header).append(iframe);
+
+  // Adiciona a div ao corpo do documento
+  $('body').append(divDocumento);
+}
+
+
+// Função para fechar a descrição do documento
+function fecharDescricaoDocumento() {
+  $('#descricaoDocumento').hide(); // Oculta a descrição do documento
+}
+
+// Função para fechar o documento completo
+function fecharDocumentoCompleto() {
+  $('.documentoContainer').remove(); // Remove a janela do documento inteira
+}
+
+// Evento de clique nos ícones de visualização
+$(document).on('click', '.bi-eye', function() {
+  var isInsideDescription = $(this).closest('#descricaoDocumento').length > 0;
+  if (isInsideDescription) {
+    var caminhoDocumento = $(this).closest('p').data('caminho-documento');
+    abrirLinkDocumento(caminhoDocumento);
+  } else {
+    var tipoDocumento = $(this).closest('tr').find('td:eq(1)').text();
+    var caminhosDocumentos = $(this).data('documentos-caminho');
+    abrirDescricaoDocumento(tipoDocumento, caminhosDocumentos);
+  }
+});
+
+// Evento de clique no botão de fechar dentro do cabeçalho
+$(document).on('click', '#btnFecharDescricao', function() {
+  var isInsideDescription = $(this).closest('#descricaoDocumento').length > 0;
+  if (isInsideDescription) {
+    fecharDescricaoDocumento(); // Fecha apenas a descrição do documento se estiver aberta
+  } else {
+    fecharDocumentoCompleto(); // Fecha a janela do documento inteira
+  }
+});
+
+
+//baixar todos os documentos
+
+  </script>
+  
+  
+    
+    <script>
+      $(document).ready(function() {
+    $('#BaixarTodos').click(function() {
+        var linksDeDocumentos = [];
+
+        // Coleta todos os links de documentos disponíveis na página
+        $('.bi-eye').each(function() {
+            var caminhosDocumentos = $(this).data('documentos-caminho');
+            if (caminhosDocumentos) {
+                linksDeDocumentos = linksDeDocumentos.concat(caminhosDocumentos);
+            }
+        });
+
+        // Remove duplicatas
+        linksDeDocumentos = [...new Set(linksDeDocumentos)];
+
+        // Verifica se há documentos para baixar
+        if (linksDeDocumentos.length > 0) {
+            var mensagem = "Desses colaborador, esses são os links dos documentos: " + linksDeDocumentos.join(", ");
+            mensagem += "\nDeseja baixar todos esses documentos?";
+
+            // Exibe uma mensagem de confirmação
+            if (confirm(mensagem)) {
+                // Se o usuário clicar em OK, inicia o download de todos os documentos com intervalo
+                linksDeDocumentos.forEach(function(link, index) {
+                    setTimeout(function() {
+                        realizarDownload(link);
+                    }, index * 500); // Aumenta o intervalo para cada download
+                });
+            }
+        } else {
+            alert("Não há documentos disponíveis para download.");
+        }
+    });
+});
+
+    </script>
+    
+      
+  
+  <div class="modal-background" style="display: none;">
+    <button id="openSidebar"><i class="bi bi-info-circle"></i></button>
+    <div id="sidebar">
+      <div id="sidebarContent">
+        <p><h1>Nova ferramenta:</h1>
+          Ferramenta "Compliance" na tela de dados pessoais tem como finalidade fornecer ao usuário uma visão geral do status das pendências de documentos, utilizando um sistema de cores semelhante a um semáforo para indicar o nível de conformidade.
+
+          Ou seja, regras que visam manter a organização em conformidade com as normas vigentes.
+          
+          Verde: Indica que 100% dos documentos estão em conformidade, ou seja, todas as pendências foram resolvidas. Isso sugere uma situação ideal de conformidade.
+          Amarelo: Indica que parte dos documentos ainda está pendente ou em processo de resolução. Isso sugere que há áreas que requerem atenção, mas que a situação não é crítica.
+          Vermelho: Indica que há uma quantidade significativa de documentos em falta ou pendentes, o que sugere uma situação de não conformidade elevada. Isso requer uma ação imediata para remediar as pendências e garantir a conformidade.
+          Essa abordagem visual permite que os usuários identifiquem rapidamente o status geral das pendências de documentos e ajuda a priorizar as ações necessárias para manter ou alcançar a conformidade adequada.</p>
+        <button id="closeSidebar">Fechar</button>
+      </div>
+    </div>
+    <div class="tituloCompliance">
+      
+      <button onclick="closeModal()" style="float: right;">fechar</button>  
+      <h3>Compliance</h3>
+      <div class="modal-content">
+        <div class="card1">
+          <img src="{% static 'bootstrap/images/AEGEA/logo/solzinho.png' %}" alt="AEGEA" width="300" height="300">
+          <p>Mapemaneto completo da sua organização!</p>
+          <p>Documentos desse colaborador está Completo</p>
+          <h1>PARABÉNS!</h1>
+        </div>
+        <div class="space"></div>
+        <div style="flex: 1;">
+          <div class="card">
+            <div class="card-header">
+              <h2>Documentos há Verificar</h2>
+            </div> 
+            <div class="card-body">
+              <ul id="documentos-list"></ul>
+            </div>
+          </div>
+          <form id="formEmail">
+            {% csrf_token %}
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <button type="button" id="enviarEmailBtn">Enviar Email</button>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+        
+  </div>
+</div>
+
+<script>
+
+
+const openButton = document.getElementById('openSidebar');
+  const closeButton = document.getElementById('closeSidebar');
+  const sidebar = document.getElementById('sidebar');
+  
+  openButton.addEventListener('click', () => {
+    sidebar.style.right = '0'; // Abre o sidebar movendo-o para a direita
+  });
+  
+  closeButton.addEventListener('click', () => {
+    sidebar.style.right = '-250px'; // Fecha o sidebar movendo-o para a esquerda
+  });
+</script>
+
+<script>
+function openModal() {
+    document.querySelector('.modal-background').style.display = 'flex';
+
+}
+
+function closeModal() {
+    document.querySelector('.modal-background').style.display = 'none';
+}
+
+    
+</script>
+
+
+<script src="{% static 'bootstrap/js/src/dados_pessoais.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+
+{% endblock %}

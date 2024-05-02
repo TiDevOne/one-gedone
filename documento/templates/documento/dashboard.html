@@ -1,0 +1,618 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href='{% static "\bootstrap\css\dashboard.css" %}'>
+{% endblock %}
+
+
+
+
+{% block content %}
+<style>
+    .modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+  /* Estilo para linhas pares */
+}
+/* Estilo para linhas pares */
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Estilo para linhas ímpares */
+tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+/* Espaçamento entre as colunas */
+table {
+    border-collapse: separate;
+    border-spacing: 2px;
+    width: 100%; /* Largura total da tabela */
+}
+
+/* Centralizar conteúdo das células */
+td, th {
+    padding: 2px; /* Espaçamento interno das células */
+    text-align: center;
+}
+
+
+</style>
+
+
+
+
+<div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="tabelaDetalhes"></div>
+    </div>
+  </div>
+  
+    <div class="btn-group">
+        <button class="btn-ativo" onclick="exibirGraficosAtivos()">Ativos: <span id="total-ativos"></span></button>
+        <button class="btn-inativo" onclick="exibirGraficosInativos()">Inativos: <span id="total-inativos"></span></button>
+    </div>
+
+<div class="container-box">
+    <div class="box1">
+        <div class="box">
+            <h1>ASO Admissional</h1>
+        </div>
+        <div class="box-interno1" >
+            <p>Existente</p>
+            <p id="valorexistente">valorexistente</p>
+        </div>
+        <div class="box-interno2" >
+            <p>Pendentes</p>
+            <p id="valorpendente">valorpendente</p>
+        </div>
+    </div>
+
+    <div class="box1">
+        <div class="box">
+            <h1>Documentos Obrigatórios</h1>
+        </div>
+        <div class="box-interno1" >
+            <p>Existente</p>
+            <p id="valorexistenteObrigatorios">valorexistente</p>
+        </div>
+        <div class="box-interno2" >
+            <p>Pendentes</p>
+            <p id="valorpendenteObrigatorios">valorpendente</p>
+        </div>
+    </div>
+
+    <div class="box1">
+        <div class="box">
+            <h1>Cartões de Ponto</h1>
+        </div>
+        <div class="box-interno1" >
+            <p>Existente</p>
+            <p id="valorexistentePonto">valorexistente</p>
+        </div>
+        <div class="box-interno2" >
+            <p>Pendentes</p>
+            <p id="valorpendentePonto">valorexistente</p>
+        </div>
+    </div>
+
+</div>
+
+
+<div id="grafico-container" style="width: 100%; overflow-x: auto;">
+    <div id="graficos" style="display: flex; margin: 0; font-size: 0;">
+        <canvas id="grafico-unidades" width="400" height="100" style="margin-right: 0;"></canvas>
+        <canvas id="grafico-unidades-restantes" width="400" height="100" style="margin-left: 0;"></canvas>
+    </div>
+</div>
+
+
+
+
+<script>
+    // Função para exibir gráficos de documentos pendentes por unidade
+    function exibirGraficosAtivos() {
+
+        $.ajax({
+            url: "{% url 'aso_percentual_ativo' %}",  // URL da view para percentuais ativos
+            type: 'GET',
+            success: function(data) {
+                // Assume que 'data' é um objeto JSON no formato {'Existente': '2%', 'Pendente': '98%'}
+                $('#valorexistente').text(data.Existente);
+                $('#valorpendente').text(data.Pendente);
+            },
+            error: function() {
+                console.log('Erro ao carregar os dados para ativos');
+            }
+        });
+
+        $.ajax({
+            url: "{% url 'documentos_obrigatorios_ativos' %}",  // URL da view para percentuais ativos
+            type: 'GET',
+            success: function(data) {
+                // Assume que 'data' é um objeto JSON no formato {'Existente': '2%', 'Pendente': '98%'}
+                $('#valorexistenteObrigatorios').text(data.Existente);
+                $('#valorpendenteObrigatorios').text(data.Pendente);
+            },
+            error: function() {
+                console.log('Erro ao carregar os dados para ativos');
+            }
+        });
+
+        $.ajax({
+            url: "{% url 'documentos_ponto_ativos' %}",  // URL da view para percentuais ativos
+            type: 'GET',
+            success: function(data) {
+                // Assume que 'data' é um objeto JSON no formato {'Existente': '2%', 'Pendente': '98%'}
+                $('#valorexistentePonto').text(data.Existente);
+                $('#valorpendentePonto').text(data.Pendente);
+            },
+            error: function() {
+                console.log('Erro ao carregar os dados para ativos');
+            }
+        });
+    
+        // Seu código JavaScript com as configurações do Chart.js e do plugin Datalabels
+fetch("{% url 'obrigatorios_por_unidade' %}")
+    .then(response => response.json())
+    .then(data => {
+        unidadesData = data;
+        let unidades = unidadesData.map(item => item.unidade);
+        let totalPendentes = unidadesData.map(item => item.total_pendentes);
+        
+        let unidades10 = unidades.slice(0, 10);
+        let totalPendentes10 = totalPendentes.slice(0, 10);
+        
+        let unidadesRestantes = unidades.slice(10);
+        let totalPendentesRestantes = totalPendentes.slice(10);
+        
+        if (unidadesRestantes.length > 10) {
+            unidadesRestantes = unidadesRestantes.slice(0, 10);
+            totalPendentesRestantes = totalPendentesRestantes.slice(0, 10);
+        }
+
+        const totalMax10 = Math.max(...totalPendentes10);
+        const totalPendentesPorcentagem10 = totalPendentes10.map(value => (value / totalMax10) * 100);
+
+        const ctxUnidades = document.getElementById('grafico-unidades').getContext('2d');
+        graficoUnidades = new Chart(ctxUnidades, {
+            type: 'bar',
+            data: {
+                labels: unidades10,
+                datasets: [{
+                    label: 'Total Pendentes (%)',
+                    data: totalPendentesPorcentagem10,
+                    backgroundColor: '#4B87B9',
+                    borderColor: '#4B87B9',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + "%";
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    datalabels: {
+                        anchor: 'center', // Ancora os valores no centro das barras
+                        align: 'center', // Alinha os valores ao centro
+                        formatter: function(value, context) {
+                            return value.toFixed(2) + '%';
+                        }
+                    }
+                }
+            }
+        });
+
+        if (unidadesRestantes.length > 0) {
+            const ctxUnidadesRestantes = document.getElementById('grafico-unidades-restantes').getContext('2d');
+            const totalMaxRestantes = Math.max(...totalPendentesRestantes);
+            const totalPendentesPorcentagemRestantes = totalPendentesRestantes.map(value => (value / totalMaxRestantes) * 100);
+            
+            graficoUnidadesRestantes = new Chart(ctxUnidadesRestantes, {
+                type: 'bar',
+                data: {
+                    labels: unidadesRestantes,
+                    datasets: [{
+                        label: 'Total Pendentes (%)',
+                        data: totalPendentesPorcentagemRestantes,
+                        backgroundColor: '#4B87B9',
+                        borderColor: '#4B87B9',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                display: false // Oculta os valores do eixo Y
+                            }
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            anchor: 'center', // Ancora os valores no centro das barras
+                            align: 'center', // Alinha os valores ao centro
+                            formatter: function(value, context) {
+                                return value.toFixed(2) + '%';
+                            }
+                        }
+                    }
+                }
+            });
+        
+
+    // Adicionar evento de clique nas barras do segundo gráfico
+    ctxUnidadesRestantes.canvas.onclick = function(evt) {
+        const activePoint = graficoUnidadesRestantes.getElementsAtEventForMode(evt, 'nearest', { intersect: true });
+        if (activePoint.length) {
+            const index = activePoint[0].index;
+            const unidadeSelecionada = unidadesRestantes[index];
+            exibirGraficoDocumentos(unidadeSelecionada, unidadesData[index + 10].documentos, 'ativos');
+        }
+    };
+}
+
+        // Adicionar evento de clique nas barras do gráfico de unidades
+        ctxUnidades.canvas.onclick = function(evt) {
+            const activePoint = graficoUnidades.getElementsAtEventForMode(evt, 'nearest', { intersect: true });
+            if (activePoint.length) {
+                const index = activePoint[0].index;
+                const unidadeSelecionada = unidades[index];
+                exibirGraficoDocumentos(unidadeSelecionada, unidadesData[index].documentos, 'ativos');
+            }
+        };
+    
+        // Atualizar o total de ativos
+        document.getElementById('total-ativos').textContent = totalAtivosInicial; // Usando o valor inicial
+    })
+    .catch(error => console.error('Erro ao carregar dados:', error));
+    }
+    
+    // Função para exibir gráfico de documentos pendentes por tipo para uma unidade específica
+    function exibirGraficoDocumentos(unidade, documentos, estado) {
+        documentosData = documentos; // Armazenar os dados dos documentos pendentes
+    
+        const tiposDocumento = documentosData.map(doc => doc.tipo_documento);
+        const quantidades = documentosData.map(doc => doc.quantidade);
+    
+        // Remover gráfico de unidades
+        graficoUnidades.destroy();
+    
+        // Definir o título do gráfico com o nome da unidade e o estado dos dados
+        let titulo = `${unidade} - Pendentes`;
+        if (estado === 'ativos') {
+            titulo += ' - Ativos';
+        } else if (estado === 'inativos') {
+            titulo += ' - Inativos';
+        }
+    
+        // Criar gráfico de barras de documentos pendentes por tipo
+        const ctxDocumentos = document.getElementById('grafico-unidades').getContext('2d');
+        const graficoDocumentos = new Chart(ctxDocumentos, {
+            type: 'bar',
+            data: {
+                labels: tiposDocumento,
+                datasets: [{
+                    label: 'Quantidade Pendente',
+                    data: quantidades,
+                    backgroundColor: '#4B87B9',
+                    borderColor: '#4B87B9',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: titulo // Definir o título do gráfico
+                    }
+                }
+            }
+        });
+    
+        // Adicionar evento de clique nas barras do gráfico de documentos
+        ctxDocumentos.canvas.onclick = function(evt) {
+            const activePoint = graficoDocumentos.getElementsAtEventForMode(evt, 'nearest', { intersect: true });
+            if (activePoint.length) {
+                const index = activePoint[0].index;
+                exibirDetalhesDocumento(index);
+            }
+        };
+    
+        // Adicionar botão de voltar
+        const backButton = document.createElement('button');
+        backButton.textContent = 'Voltar';
+        backButton.onclick = function() {
+            // Destruir o gráfico de documentos pendentes por tipo
+            graficoDocumentos.destroy();
+            // Recriar o gráfico de unidades utilizando os dados armazenados
+            exibirGraficosAtivos();
+            // Remover o botão de voltar
+            backButton.remove();
+        };
+        document.getElementById('grafico-container').appendChild(backButton);
+    }
+    
+    // Função para exibir tabela de detalhes ao clicar em uma barra do gráfico de documentos
+    function exibirDetalhesDocumento(index) {
+    const documentoSelecionado = documentosData[index];
+    console.log("documentoSelecionado:", documentoSelecionado); // Verifique o conteúdo de documentoSelecionado
+
+    // Verifique se as chaves regional e unidade existem em documentoSelecionado
+    console.log("regional:", documentoSelecionado.regional);
+    console.log("unidade:", documentoSelecionado.unidade);
+
+    const tabelaDetalhesHTML = `
+       <table>
+        <thead>
+            <!-- Linha de cabeçalho personalizado com o título da unidade filtrada -->
+            <tr style="background-color: #723588; color: #ffffff;">
+                <th colspan="9">${documentoSelecionado.unidade} - Detalhes</th>
+            </tr>
+            <!-- Cabeçalho padrão da tabela -->
+            <tr>
+                <th>Regional</th>
+                <th>Unidade</th>
+                <th>Cargo</th>
+                <th>Nome</th>
+                <th>Matrícula</th>
+                <th>CPF</th>
+                <th>Documento</th>
+                <th>Admissão</th>
+                <th>Ver Dossiê</th> <!-- Coluna adicional -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Linhas da tabela -->
+            ${documentoSelecionado.colaboradores.map(colaborador => `
+                <tr>
+                    <td>${documentoSelecionado.regional}</td>
+                    <td>${documentoSelecionado.unidade}</td>
+                    <td>${colaborador.cargo}</td>
+                    <td>${colaborador.nome}</td>
+                    <td>${colaborador.matricula}</td>
+                    <td>${colaborador.cpf}</td>
+                    <td>${documentoSelecionado.tipo_documento}</td>
+                    <td>${colaborador.admissao}</td>
+                    <td><i class="bi bi-search" onclick="redirecionarParaDadosPessoais('${documentoSelecionado.regional}', '${documentoSelecionado.unidade}', '${colaborador.cargo}', '${colaborador.nome}', '${colaborador.matricula}', '${colaborador.cpf}', '${documentoSelecionado.tipo_documento}', '${colaborador.admissao}')"></i></td> <!-- Ícone para ver dossiê -->
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    `;
+
+    console.log("tabelaDetalhesHTML:", tabelaDetalhesHTML); // Verifique o HTML gerado
+
+    // Adicionando função para redirecionar ao clicar no ícone de busca
+    window.redirecionarParaDadosPessoais = function (regional, unidade, cargo, nome, matricula, cpf, tipoDocumento, admissao) {
+        const url = `{% url 'dados_pessoais' %}?regional=${encodeURIComponent(regional)}&unidade=${encodeURIComponent(unidade)}&cargo=${encodeURIComponent(cargo)}&colaborador=${encodeURIComponent(nome)}&matricula=${encodeURIComponent(matricula)}&cpf=${encodeURIComponent(cpf)}&tipoDocumento=${encodeURIComponent(tipoDocumento)}&admissao=${encodeURIComponent(admissao)}`;
+        window.location.href = url;
+    };
+
+
+
+    
+        // Criar o modal
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div id="tabelaDetalhes">${tabelaDetalhesHTML}</div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    
+        // Exibir o modal
+        modal.style.display = 'block';
+    
+        // Fechar o modal ao clicar no botão de fechar (×) ou fora da janela modal
+        const closeButton = modal.querySelector('.close');
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.remove();
+            }
+        }
+        closeButton.onclick = function() {
+            modal.remove();
+        }
+    }
+    
+    // Função para buscar os dados da view TotalColaboradoresView e exibir os gráficos quando a página carregar
+    window.onload = function() {
+        getTotalColaboradores();
+        exibirGraficosAtivos();
+    };
+    
+    // Função para buscar os dados da view TotalColaboradoresView
+    async function getTotalColaboradores() {
+        try {
+            const response = await fetch("{% url 'total_colaboradores' %}");
+            const data = await response.json();
+    
+            // Atualizar o texto dos botões com as quantidades de ativos e inativos
+            document.getElementById('total-ativos').textContent = data.total_ativos;
+            document.getElementById('total-inativos').textContent = data.total_inativos;
+        } catch (error) {
+            console.error('Erro ao buscar os dados dos colaboradores:', error);
+        }
+    }
+
+    // Função para exibir gráficos de documentos pendentes por unidade para os inativos
+    function exibirGraficosInativos() {
+        $.ajax({
+            url: "{% url 'aso_percentual_inativo' %}",  // URL da view para percentuais inativos
+            type: 'GET',
+            success: function(data) {
+                // Assume que 'data' é um objeto JSON no formato {'Existente': '2%', 'Pendente': '98%'}
+                $('#valorexistente').text(data.Existente);
+                $('#valorpendente').text(data.Pendente);
+            },
+            error: function() {
+                console.log('Erro ao carregar os dados para inativos');
+            }
+        });
+
+
+        $.ajax({
+            url: "{% url 'documentos_obrigatorios_inativos' %}",  // URL da view para percentuais inativos
+            type: 'GET',
+            success: function(data) {
+                // Assume que 'data' é um objeto JSON no formato {'Existente': '2%', 'Pendente': '98%'}
+                $('#valorexistenteObrigatorios').text(data.Existente);
+                $('#valorpendenteObrigatorios').text(data.Pendente);
+            },
+            error: function() {
+                console.log('Erro ao carregar os dados para inativos');
+            }
+        });
+
+        $.ajax({
+            url: "{% url 'documentos_ponto_inativos' %}",  // URL da view para percentuais ativos
+            type: 'GET',
+            success: function(data) {
+                // Assume que 'data' é um objeto JSON no formato {'Existente': '2%', 'Pendente': '98%'}
+                $('#valorexistentePonto').text(data.Existente);
+                $('#valorpendentePonto').text(data.Pendente);
+            },
+            error: function() {
+                console.log('Erro ao carregar os dados para ativos');
+            }
+        });
+        
+
+        fetch("{% url 'obrigatorios_inativos_unid' %}")
+            .then(response => response.json())
+            .then(data => {
+                unidadesData = data;
+                const unidades = unidadesData.map(item => item.unidade);
+                const totalPendentes = unidadesData.map(item => item.total_pendentes);
+
+                const totalMax = Math.max(...totalPendentes);
+                const totalPendentesPorcentagem = totalPendentes.map(value => (value / totalMax) * 100);
+
+                const ctxUnidades = document.getElementById('grafico-unidades').getContext('2d');
+                
+                // Destruir o gráfico anterior, se existir
+                if (typeof graficoUnidades !== 'undefined') {
+                    graficoUnidades.destroy();
+                }
+
+                graficoUnidades = new Chart(ctxUnidades, {
+                    type: 'bar',
+                    data: {
+                        labels: unidades,
+                        datasets: [{
+                            label: 'Total Pendentes (%)',
+                            data: totalPendentesPorcentagem,
+                            backgroundColor: '#4B87B9', // Cor para inativos
+                            borderColor: '#4B87B9',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + "%";
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'top',
+                                formatter: function(value, context) {
+                                    return value.toFixed(2) + '%';
+                                }
+                            }
+                        }
+                    }
+                });
+
+                ctxUnidades.canvas.onclick = function(evt) {
+                    const activePoint = graficoUnidades.getElementsAtEventForMode(evt, 'nearest', { intersect: true });
+                    if (activePoint.length) {
+                        const index = activePoint[0].index;
+                        const unidadeSelecionada = unidades[index];
+                        exibirGraficoDocumentos(unidadeSelecionada, unidadesData[index].documentos);
+                    }
+                };
+
+                document.getElementById('total-ativos').textContent = totalAtivosInicial;
+            })
+            .catch(error => console.error('Erro ao carregar dados:', error));
+    }
+    
+ 
+</script>
+
+    
+
+
+   
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+    <script src='{% static "bootstrap/js/src/dashboard.js" %}'></script>
+
+</body>
+
+    {% endblock %}

@@ -1,0 +1,22 @@
+<!-- import_usuarios.html -->
+
+{% extends 'documento/base.html' %}
+{% load static %}
+
+{% block content %}
+    <h2>Importar Usuários</h2>
+
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <form action="{% url 'importar_usuarios' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Importar Usuários</button>
+    </form>
+{% endblock %}
+
+

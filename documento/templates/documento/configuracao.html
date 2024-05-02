@@ -1,0 +1,2894 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href='{% static "\bootstrap\css\configuracao.css" %}'>
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+<form method="post">
+  {% csrf_token %}
+      <script>
+      // Define a URL do endpoint diretamente no JavaScript
+      var urlAtualizarASO = "{% url 'atualizar-aso' %}";
+
+      // Inclua aqui o código do seu arquivo JavaScript externo
+  </script>
+  <!-- Seus outros campos de input vão aqui -->
+</form>
+
+    <nav class="menu-lateral">
+        <div class="btn-expandir">
+            <i class="bi bi-list" id="btn-exp"></i>
+        </div>
+        <ul>
+            <li class="item-menu" data-target="CadastrosFuncionariosForm">
+                <a href="#">
+                    <h1>
+                        <span class="icon"><i class="bi bi-people"></i></span>
+                        <span class="txt-link">Cadastros de Funcionários</span>
+                    </h1>
+                </a>
+            </li>
+        
+            <li class="item-menu" data-target="SincronizarDocumentosForm">
+              <a href="#" id="sincronizarDocumentosBtn">
+                <h1>
+                    <span class="icon"><i class="bi bi-arrow-counterclockwise"></i></span>
+                    <span class="txt-link">Sincronizar Documentos</span>
+                </h1>
+            </a>
+            </li>
+            <li class="item-menu" data-target="RessincronizarForm">
+                <a href="#">
+                    <h1>
+                        <span class="icon"><i class="bi bi-arrow-counterclockwise"></i></span>
+                        <span class="txt-link">Ressincronizar</span>
+                    </h1>
+                </a>
+            </li>
+            <li class="item-menu" data-target="AtualizarBancoForm">
+                <a href="#">
+                    <h1>
+                        <span class="icon"><i class="bi bi-arrow-counterclockwise"></i></span>
+                        <span class="txt-link">Atualizar Banco de Dados</span>
+                    </h1>
+                </a>
+            </li>
+            <li class="item-menu" data-target="CadastrosBasicosForm">
+                <a href="#">
+                    <h1>
+                        <span class="icon"><i class="bi bi-pencil-square"></i></span>
+                        <span class="txt-link">Cadastros Basicos</span>
+                    </h1>
+                </a>
+            </li>
+        
+            <li class="item-menu2" id="Empresa" data-target="EmpresaForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Empresa</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="Estabelecimento" data-target="EstabelecimentoForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Estabelecimento</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="Regionais" data-target="RegionaisForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Regionais</span>
+                </a>
+            </li>
+
+            <li class="item-menu2" id="Regiões" data-target="RegiõesForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Regiões</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="Unidades" data-target="UnidadesForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Unidades</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="Áreas" data-target="ÁreasForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Áreas</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="Setor" data-target="SetorForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Setor</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="GruposDocumentos" data-target="GruposDocumentosForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Grupo de Documentos</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="TiposDocumentos" data-target="TiposDocumentosForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Tipo de Documento</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="Ocupação" data-target="OcupaçãoForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Ocupação</span>
+                </a>
+            </li>
+            <li class="item-menu" data-target="AtualizarBancoForm">
+                <a href="#">
+                    <h1>
+                        <span class="icon"><i class="bi bi-shield-exclamation"></i></span>
+                        <span class="txt-link">Logs de Sincronização</span>
+                    </h1>
+                </a>
+            </li>
+            <li class="item-menu2" id="ErrosDepartamentos" data-target="ErrosDepartamentosForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Erros Departamentos</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="ErrosRH" data-target="ErrosRHForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Erros RH</span>
+                </a>
+            </li>
+            <li class="item-menu" data-target="DocumentosForm">
+                <a href="#">
+                    <h1>
+                        <span class="icon"><i class="bi bi-file-text"></i></span>
+                        <span class="txt-link">Documentos</span>
+                    </h1>
+                </a>
+            </li>
+            <li class="item-menu2" id="ApagarDocumento" data-target="ApagarDocumentoForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Apagar Documentos</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="DocumentosApagados" data-target="DocumentosApagadosForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Documentos Apagados</span>
+                </a>
+            </li>
+            <li class="item-menu" data-target="AtivarADForm">
+                <a href="#">
+                    <h1>
+                        <span class="icon"><i class="bi bi-person-circle"></i></span>
+                        <span class="txt-link">Ativar AD</span>
+                    </h1>
+                </a>
+            </li>
+            <li class="item-menu" data-target="SegurançaForm">
+                <a href="#">
+                    <h1>
+                        <span class="icon"><i class="bi bi-shield-shaded"></i></span>
+                        <span class="txt-link">Segurança</span>
+                    </h1>
+                </a>
+            </li>
+            <li class="item-menu2" id="usuarios" data-target="usuariosForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Usuarios</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="Permissões" data-target="PermissõesForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Permissões</span>
+                </a>
+            </li>
+            <li class="item-menu2" id="AlteraSenha" data-target="AlteraSenhaForm">
+                <a href="#">
+                    <span class="icon"><i class="bi bi-record2-fill"></i></span>
+                    <span class="txt-link">Altera Senha</span>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+
+    <div id="tabelaFuncionariosForm" class="table-container">
+        <table>
+          
+            <thead>
+                <div>
+                    <h1>FUNCIONÁRIOS</h1>
+                </div>
+                <div class="subheader3">
+                    
+                        <button id="abrirFormulario"><i class="bi bi-plus-circle-dotted"></i></button>
+                        <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+                   
+                        <select id="numLinhas" name="numLinhas">
+                          <option value="" disabled selected hidden> NºLinhas</option>
+                          <option value="8">8</option>
+                          <option value="10">10</option>
+                          <option value="15">15</option>
+                          <option value="20">20</option>
+                          <option value="40">40</option>
+                          <option value="100">100</option>
+                      </select>
+                      
+                    
+                    <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+              </div>
+            <tr>
+              <th>Unidade</th>
+              <th>Matricula</th>
+              <th>Nome</th>
+              <th>Cargo</th>
+              <th>Admissão</th>
+              <th>Situação</th>
+              <th>Desligamento</th>
+              <th>Editar</th>
+              <th>remover</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+
+
+    <div id="tabelaEmpresaForm" class="table-container">
+        <table>
+          
+            <thead>
+                <div>
+                    <h1>EMPRESA</h1>
+                </div>
+                <div class="subheader3">
+                    
+                  <button id="abrirFormularioEmpresa"><i class="bi bi-plus-circle-dotted"></i></button>
+                  <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+             
+                  <select id="numLinhas" name="numLinhas">
+                    <option value="" disabled selected hidden> NºLinhas</option>
+                    <option value="8">8</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="40">40</option>
+                    <option value="100">100</option>
+                </select>
+                
+              
+              <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+        </div>
+            <tr>
+              <th>Código</th>
+              <th>Razão Social</th>
+              <th>Url</th>
+              <th>Caminho Documento</th>
+              <th>Editar</th>
+              <th>Remover</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tabelaEmpresa">
+              <!-- Linhas da tabela serão inseridas aqui -->
+          </tbody>
+      </table>
+  </div>
+    
+
+  <div id="janelaEmpresa" class="modal" style="display: none;">
+    <div class="modal-content">
+    
+      <h1 style="margin-bottom: 10px; padding: 10px;">
+        <span style="font-size: 90%;">Cadastro Empresa</span> 
+        <span class="fecharEmpresa">&times;</span>
+    </h1>   
+        <input type="text" id="inputCodigo" style="margin-top: 10px;" placeholder="Código">
+        <input type="text" id="inputRazaoSocial" placeholder="Razão Social">
+        <input type="text" id="inputUrl" placeholder="URL">
+        <input type="text" id="inputCaminhoDocumento" placeholder="Caminho Documento">
+        <button id="cadastrarEmpresa">Cadastrar</button>
+    </div>
+</div>
+
+<script>
+  // Abre a janela de cadastro de Empresa quando o botão é clicado
+  document.getElementById("abrirFormularioEmpresa").addEventListener("click", function() {
+      document.getElementById("janelaEmpresa").style.display = "block";
+      document.body.appendChild(document.createElement("div")).classList.add("fundo-desfocado"); // Adiciona o fundo desfocado dinamicamente
+  });
+  
+  // Fecha a janela de cadastro de Empresa quando o botão de fechar é clicado
+  document.querySelector("#janelaEmpresa .fecharEmpresa").addEventListener("click", function() {
+      document.getElementById("janelaEmpresa").style.display = "none";
+      document.querySelector(".fundo-desfocado").remove(); // Remove o fundo desfocado
+  });
+</script>
+
+
+
+    <div id="tabelaEstabelecimentoForm" class="table-container">
+        <table>
+          
+            <thead>
+                <div>
+                    <h1>ESTABELECIMENTO</h1>
+                </div>
+                <div class="subheader3">
+                    
+                  <button id="abrirFormulario"><i class="bi bi-plus" style="font-size: 30px;"></i></button>
+                  <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+             
+                  <select id="numLinhas" name="numLinhas">
+                    <option value="" disabled selected hidden> NºLinhas</option>
+                    <option value="8">8</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="40">40</option>
+                    <option value="100">100</option>
+                </select>
+                
+              
+              <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+        </div>
+            <tr>
+              <!-- colunas para preencher-->
+            </tr>
+          </thead>
+          <tbody>
+            
+            <!-- linhas para preencher-->
+            
+          </tbody>
+        </table>
+    </div>
+
+
+    <div id="tabelaRegionaisForm" class="table-container">
+        <table>
+          
+            <thead>
+                <div>
+                    <h1>REGIONAIS</h1>
+                </div>
+                <div class="subheader3">
+                    
+                  <button id="abrirFormulario"><i class="bi bi-plus" style="font-size: 30px;"></i></button>
+                  <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+             
+                  <select id="numLinhas" name="numLinhas">
+                    <option value="" disabled selected hidden> NºLinhas</option>
+                    <option value="8">8</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="40">40</option>
+                    <option value="100">100</option>
+                </select>
+                
+              
+              <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+        </div>
+            <tr>
+              <th>Código</th>
+              <th>Nome</th>
+              <th>Editar</th>
+              <th>Remover</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+
+
+    <div id="tabelaRegiõesForm" class="table-container">
+        <table>
+          
+            <thead>
+                <div>
+                    <h1>REGIÕES</h1>
+                </div>
+                <div class="subheader3">
+                    
+                  <button id="abrirFormulario"><i class="bi bi-plus" style="font-size: 30px;"></i></button>
+                  <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+             
+                  <select id="numLinhas" name="numLinhas">
+                    <option value="" disabled selected hidden> NºLinhas</option>
+                    <option value="8">8</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="40">40</option>
+                    <option value="100">100</option>
+                </select>
+                
+              
+              <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+        </div>
+            <tr>
+              <th>Código</th>
+              <th>Nome</th>
+              <th>Editar</th>
+              <th>Remover</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+
+    <div id="tabelaRegiõesForm" class="table-container">
+        <table>
+          
+            <thead>
+                <div>
+                    <h1>REGIONAIS</h1>
+                </div>
+                <div class="subheader3">
+                    
+                  <button id="abrirFormulario"><i class="bi bi-plus" style="font-size: 30px;"></i></button>
+                  <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+             
+                  <select id="numLinhas" name="numLinhas">
+                    <option value="" disabled selected hidden> NºLinhas</option>
+                    <option value="8">8</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="40">40</option>
+                    <option value="100">100</option>
+                </select>
+                
+              
+              <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+        </div>
+            <tr>
+              <th>Código</th>
+              <th>Nome</th>
+              <th>Editar</th>
+              <th>Remover</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Unidade"></td>
+              <td data-label="Matricula"></td>
+              <td data-label="Nome"></td>
+              <td data-label="Cargo"></td>
+              <td data-label="Admissão"></td>
+              <td data-label="Situação"></td>
+              <td data-label="Desligamento"></td>
+              <td>
+                <button><i class="bi bi-pencil-fill"></i></button>
+              </td>
+              <td>
+                <button><i class="bi bi-trash3-fill"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+
+
+    <div id="tabelaUnidadesForm" class="table-container">
+      <table>
+        
+          <thead>
+              <div>
+                  <h1>UNIDADES</h1>
+              </div>
+              <div class="subheader3">
+                    
+                <button id="abrirFormulario"><i class="bi bi-plus" style="font-size: 30px;"></i></button>
+                <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+           
+                <select id="numLinhas" name="numLinhas">
+                  <option value="" disabled selected hidden> NºLinhas</option>
+                  <option value="8">8</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                  <option value="40">40</option>
+                  <option value="100">100</option>
+              </select>
+              
+            
+            <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+      </div>
+          <tr>
+            <th>Código</th>
+            <th>Nome</th>
+            <th>Editar</th>
+            <th>Remover</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Unidade"></td>
+            <td data-label="Matricula"></td>
+            <td data-label="Nome"></td>
+            <td data-label="Cargo"></td>
+            <td data-label="Admissão"></td>
+            <td data-label="Situação"></td>
+            <td data-label="Desligamento"></td>
+            <td>
+              <button><i class="bi bi-pencil-fill"></i></button>
+            </td>
+            <td>
+              <button><i class="bi bi-trash3-fill"></i></button>
+            </td>
+          </tr>
+          
+          <tr>
+            <td data-label="Unidade"></td>
+            <td data-label="Matricula"></td>
+            <td data-label="Nome"></td>
+            <td data-label="Cargo"></td>
+            <td data-label="Admissão"></td>
+            <td data-label="Situação"></td>
+            <td data-label="Desligamento"></td>
+            <td>
+              <button><i class="bi bi-pencil-fill"></i></button>
+            </td>
+            <td>
+              <button><i class="bi bi-trash3-fill"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td data-label="Unidade"></td>
+            <td data-label="Matricula"></td>
+            <td data-label="Nome"></td>
+            <td data-label="Cargo"></td>
+            <td data-label="Admissão"></td>
+            <td data-label="Situação"></td>
+            <td data-label="Desligamento"></td>
+            <td>
+              <button><i class="bi bi-pencil-fill"></i></button>
+            </td>
+            <td>
+              <button><i class="bi bi-trash3-fill"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td data-label="Unidade"></td>
+            <td data-label="Matricula"></td>
+            <td data-label="Nome"></td>
+            <td data-label="Cargo"></td>
+            <td data-label="Admissão"></td>
+            <td data-label="Situação"></td>
+            <td data-label="Desligamento"></td>
+            <td>
+              <button><i class="bi bi-pencil-fill"></i></button>
+            </td>
+            <td>
+              <button><i class="bi bi-trash3-fill"></i></button>
+            </td>
+          </tr>
+          <tr>
+            <td data-label="Unidade"></td>
+            <td data-label="Matricula"></td>
+            <td data-label="Nome"></td>
+            <td data-label="Cargo"></td>
+            <td data-label="Admissão"></td>
+            <td data-label="Situação"></td>
+            <td data-label="Desligamento"></td>
+            <td>
+              <button><i class="bi bi-pencil-fill"></i></button>
+            </td>
+            <td>
+              <button><i class="bi bi-trash3-fill"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  </div>
+
+
+  
+<div id="tabelaÁreasForm" class="table-container">
+    <table>
+        <div>
+            <h1>ÁREA</h1>
+        </div>
+        <div class="subheader3">
+            <button id="abrirFormularioArea"><i class="bi bi-plus-circle-dotted"></i></button>
+            <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+            <select id="numLinhas" name="numLinhas">
+                <option value="" disabled selected hidden> NºLinhas</option>
+                <option value="8">8</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="40">40</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nome</th>
+                <th>Editar</th>
+                <th>Remover</th>
+                
+            </tr>
+        </thead>
+        <tbody id="tabelaCorpo">
+            <!-- Linhas da tabela serão inseridas aqui -->
+        </tbody>
+    </table>
+</div>
+
+<div id="janelaCadastro" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h1 style="margin-bottom: 10px; padding: 10px;">
+        <span style="font-size: 90%;">Cadastro Área</span> 
+        <span class="fechar">&times;</span>
+    </h1>
+        <input type="text" id="inputCodigo" placeholder="Código">
+        <input type="text" id="inputNome" placeholder="Nome">
+        <button id="cadastrar">Cadastrar</button>
+    </div>
+</div>
+
+<div id="modalEditar" class="modal">
+  <div class="modal-content">
+    <h1 style="margin-bottom: 10px; padding: 10px; display: flex; justify-content: space-between;">
+      <span style="font-size: 90%;">Editar Área</span> 
+      <span class="close" style="cursor: pointer;">&times;</span>
+    </h1>
+    <label for="editCodigo">Código:
+    <input type="text" id="editCodigo" name="editCodigo"></label>
+    <label for="editNome">Nome:
+    <input type="text" id="editNome" name="editNome"></label>
+    <button id="salvarEdicao">Salvar</button>
+  </div>
+</div>
+
+
+<form id="csrf-form">
+    {% csrf_token %}
+</form>
+
+<script>
+      // Abre a janela de cadastro quando o botão é clicado
+    document.getElementById("abrirFormularioArea").addEventListener("click", function() {
+        document.getElementById("janelaCadastro").style.display = "block";
+        document.body.appendChild(document.createElement("div")).classList.add("fundo-desfocado"); // Adiciona o fundo desfocado dinamicamente
+    });
+
+    // Fecha a janela de cadastro quando o botão de fechar é clicado
+    document.getElementsByClassName("fechar")[0].addEventListener("click", function() {
+        document.getElementById("janelaCadastro").style.display = "none";
+        document.querySelector(".fundo-desfocado").remove(); // Remove o fundo desfocado
+    });
+
+    document.getElementById('cadastrar').addEventListener('click', function() {
+        var codigo = document.getElementById('inputCodigo').value;
+        var nome = document.getElementById('inputNome').value;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '{% url "cadastrar_area" %}', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        // Obtendo o token CSRF
+        var csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+        xhr.setRequestHeader('X-CSRFToken', csrfToken);
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    alert('Área cadastrada com sucesso!');
+                    // Você pode adicionar qualquer lógica adicional aqui
+                } else {
+                    alert('Ocorreu um erro ao cadastrar a área.');
+                }
+            }
+        };
+        xhr.send(JSON.stringify({codigo: codigo, nome: nome}));
+    });
+</script>
+
+<script>
+    // Função para abrir a janela de edição
+    function editarArea(area) {
+        // Preenche o modal de edição com os dados da área selecionada
+        var editCodigoInput = document.getElementById("editCodigo");
+        var editNomeInput = document.getElementById("editNome");
+        editCodigoInput.value = area.codigo;
+        editNomeInput.value = area.nome;  
+
+        // Exibe o modal de edição
+        var modal = document.getElementById("modalEditar");
+        modal.style.display = "block";
+
+        // Adiciona o fundo desfocado dinamicamente
+        document.body.appendChild(document.createElement("div")).classList.add("fundo-desfocado-editar");
+
+        // Fecha o modal quando clicar no botão Fechar (X)
+        var span = modal.getElementsByClassName("close")[0];
+        span.onclick = function() {
+            modal.style.display = "none";
+            // Remove o fundo desfocado
+            document.querySelector(".fundo-desfocado-editar").remove();
+        }
+
+        // Fecha o modal se clicar fora da área do modal
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                // Remove o fundo desfocado
+                document.querySelector(".fundo-desfocado-editar").remove();
+            }
+        }
+
+        // Implementa a lógica para salvar as alterações ao clicar no botão Salvar
+        var salvarEdicaoButton = document.getElementById("salvarEdicao");
+        salvarEdicaoButton.onclick = function() {
+            // Obtém os novos dados da área editada
+            var novoCodigo = editCodigoInput.value;
+            var novoNome = editNomeInput.value;
+
+            // Cria um objeto com os dados atualizados para enviar ao servidor
+            var dadosAtualizados = {
+                id: area.id,
+                codigo: novoCodigo,
+                nome: novoNome
+            };
+
+            // Envia uma solicitação AJAX para atualizar os dados da área
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    // Atualiza a tabela após a edição bem-sucedida
+                    carregarAreas();
+                    // Fecha o modal
+                    modal.style.display = "none";
+                    // Remove o fundo desfocado
+                    document.querySelector(".fundo-desfocado-editar").remove();
+                }
+            };
+            xhttp.open("POST", '{% url "cadastrar_area" %}', true); // Use a URL correta da sua rota no Django
+            xhttp.setRequestHeader("Content-type", "application/json");
+            xhttp.send(JSON.stringify(dadosAtualizados));
+        }
+    }
+
+// Função para fazer a solicitação AJAX para excluir uma área
+function excluirArea(area_id) {
+    // Confirmação do usuário antes de excluir a área
+    if (confirm("Tem certeza de que deseja excluir esta área?")) {
+        // Envia uma solicitação AJAX para excluir a área
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                // Atualiza a tabela após a exclusão bem-sucedida
+                carregarAreas();
+            }
+        };
+        xhttp.open("POST", '{% url "cadastrar_area" %}', true); // Use a URL correta da sua rota no Django
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send(JSON.stringify({id: area_id, excluir: true}));
+    }
+}
+
+// Função para fazer a solicitação AJAX
+function carregarAreas() {
+  fetch('{% url "cadastrar_area" %}', {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken
+          }
+      })
+      .then(response => response.json())
+      .then(data => {
+          const selectArea = document.getElementById('selectArea');
+          selectArea.innerHTML = ''; // Limpa as opções existentes
+          data.areas.forEach(area => {
+              const option = document.createElement('option');
+              option.value = area.id;
+              option.textContent = area.nome;
+              selectArea.appendChild(option);
+          });
+      })
+      .catch(error => {
+          console.error('Erro ao carregar áreas:', error);
+      });
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var areas = JSON.parse(this.responseText).areas;
+            var tableBody = document.getElementById("tabelaCorpo");
+
+            // Limpa a tabela antes de adicionar os novos dados
+            tableBody.innerHTML = "";
+
+            // Itera sobre as áreas e adiciona à tabela
+            areas.forEach(function(area) {
+                var row = tableBody.insertRow();
+                var codigoCell = row.insertCell(0);
+                var nomeCell = row.insertCell(1);
+                var editarCell = row.insertCell(2);
+                var removerCell = row.insertCell(3);
+                codigoCell.textContent = area.codigo;
+                nomeCell.textContent = area.nome;
+
+                // Botão Editar
+                var editarButton = document.createElement("button");
+                var editarIcon = document.createElement("i");
+                editarIcon.classList.add("bi", "bi-pencil-fill");
+                editarButton.appendChild(editarIcon);
+                editarButton.addEventListener("click", function() {
+                    editarArea(area);
+                });
+                editarCell.appendChild(editarButton);
+
+                // Botão Remover
+                var removerButton = document.createElement("button");
+                var removerIcon = document.createElement("i");
+                removerIcon.classList.add("bi", "bi-trash3-fill");
+                removerButton.appendChild(removerIcon);
+                removerButton.addEventListener("click", function() {
+                    excluirArea(area.id);
+                });
+                removerCell.appendChild(removerButton);
+            });
+        }
+    };
+    xhttp.open("GET", '{% url "cadastrar_area" %}', true);
+    xhttp.send();
+}
+
+
+
+
+</script>
+
+<div id="tabelaSetorForm" class="table-container">
+  <table>
+    
+      <thead>
+          <div>
+              <h1>SETORES</h1>
+          </div>
+          <div class="subheader3">
+                    
+            <button id="abrirFormulario"><i class="bi bi-plus" style="font-size: 30px;"></i></button>
+            <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+       
+            <select id="numLinhas" name="numLinhas">
+              <option value="" disabled selected hidden> NºLinhas</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="40">40</option>
+              <option value="100">100</option>
+          </select>
+          
+        
+        <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+  </div>
+      <tr>
+        <th>Código</th>
+        <th>Nome</th>
+        <th>Editar</th>
+        <th>Remover</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="tabelaGruposDocumentosForm" class="table-container">
+  <table>
+      <div>
+          <h1>Grupos de Documento</h1>
+      </div>
+      <div class="subheader3">
+          <button id="abrirFormularioGrupoDocumento"><i class="bi bi-plus-circle-dotted"></i></button>
+          <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+          <select id="numLinhas" name="numLinhas">
+              <option value="" disabled selected hidden>NºLinhas</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="40">40</option>
+              <option value="100">100</option>
+          </select>
+      </div>
+      <thead>
+          <tr>
+              <th>Código</th>
+              <th>Nome</th>
+              <th>Editar</th>
+              <th>Remover</th>
+          </tr>
+      </thead>
+      <tbody id="tabelaCorpoGruposDocumento">
+          <!-- Linhas da tabela serão inseridas aqui -->
+      </tbody>
+  </table>
+</div>
+<div id="janelaCadastroGrupoDocumento" class="modal" style="display: none;">
+  <div class="modal-content">
+      <h1 style="margin-bottom: 10px; padding: 10px;">
+        <span style="font-size: 90%;">Cadastro Grupo de Documento</span> 
+        <span class="fechar">&times;</span>
+    </h1>   
+      <input type="text" id="inputCodigoGrupoDocumento" placeholder="Código">
+      <input type="text" id="inputNomeGrupoDocumento" placeholder="Nome">
+      <select id="selectArea" name="area">
+          <!-- As opções serão preenchidas dinamicamente com JavaScript -->
+      </select>
+  </div>
+  <button id="cadastrarGrupoDocumento">Cadastrar</button>
+</div>
+
+<!-- Modal de edição de Grupo de Documento -->
+<div id="modalEditarGrupoDocumento" class="modal">
+  <div class="modal-content">
+    <h1 style="margin-bottom: 10px; padding: 10px; display: flex; justify-content: space-between;">
+      <span style="font-size: 90%;">Editar Grupo de Documento</span> 
+      <span class="close"style="cursor: pointer;">&times;</span>
+  </h1> 
+      <label for="editCodigoGrupoDocumento">Código:
+      <input type="text" id="editCodigoGrupoDocumento" name="editCodigoGrupoDocumento"></label>
+      <label for="editNomeGrupoDocumento">Nome:
+      <input type="text" id="editNomeGrupoDocumento" name="editNomeGrupoDocumento"></label>
+      <button id="salvarEdicaoGrupoDocumento">Salvar</button>
+  </div>
+</div>
+
+<form id="csrf-form">
+  {% csrf_token %}
+</form>
+<script>
+  // Abre a janela de cadastro de Grupo de Documento quando o botão é clicado
+  document.getElementById("abrirFormularioGrupoDocumento").addEventListener("click", function() {
+      document.getElementById("janelaCadastroGrupoDocumento").style.display = "block";
+      document.body.appendChild(document.createElement("div")).classList.add("fundo-desfocado"); // Adiciona o fundo desfocado dinamicamente
+  });
+  
+  // Fecha a janela de cadastro de Grupo de Documento quando o botão de fechar é clicado
+  document.querySelector("#janelaCadastroGrupoDocumento .fechar").addEventListener("click", function() {
+      document.getElementById("janelaCadastroGrupoDocumento").style.display = "none";
+      document.querySelector(".fundo-desfocado").remove(); // Remove o fundo desfocado
+  });
+
+  // Cadastrar novo grupo de documento
+  document.getElementById("cadastrarGrupoDocumento").addEventListener("click", function() {
+      var codigo = document.getElementById("inputCodigoGrupoDocumento").value;
+      var nome = document.getElementById("inputNomeGrupoDocumento").value;
+      var area_id = document.getElementById("selectArea").value; // Obtém o ID da área selecionada
+
+      var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Obtém o token CSRF
+
+      // Envia os dados para o servidor Django
+      fetch('{% url "cadastrar_grupo_documento" %}', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken // Inclui o token CSRF no cabeçalho
+          },
+          body: JSON.stringify({
+              codigo: codigo,
+              nome: nome,
+              area_id: area_id // Inclui o ID da área selecionada
+          })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.status === 'success') {
+              alert(data.message);
+              // Se o cadastro for bem-sucedido, você pode realizar ações adicionais, como atualizar a tabela de grupos de documentos
+          } else {
+              alert('Erro ao cadastrar grupo de documento: ' + data.message);
+          }
+      })
+      .catch(error => {
+          console.error('Erro ao cadastrar grupo de documento:', error);
+      });
+  });
+
+  var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+// Função para carregar as áreas existentes no <select>
+    
+</script>
+
+<script>
+  // Função para abrir a janela de edição
+  function editarGrupoDocumento(grupo) {
+      // Preenche o modal de edição com os dados do grupo selecionado
+      var editCodigoInput = document.getElementById("editCodigoGrupoDocumento");
+      var editNomeInput = document.getElementById("editNomeGrupoDocumento");
+      editCodigoInput.value = grupo.codigo;
+      editNomeInput.value = grupo.nome;
+
+      // Exibe o modal de edição
+      var modal = document.getElementById("modalEditarGrupoDocumento");
+      modal.style.display = "block";
+
+      // Adiciona o fundo desfocado dinamicamente
+      document.body.appendChild(document.createElement("div")).classList.add("fundo-desfocado-editar");
+
+      // Fecha o modal quando clicar no botão Fechar (X)
+      var span = modal.getElementsByClassName("close")[0];
+      span.onclick = function() {
+          modal.style.display = "none";
+          // Remove o fundo desfocado
+          document.querySelector(".fundo-desfocado-editar").remove();
+      }
+
+      // Fecha o modal se clicar fora da área do modal
+      window.onclick = function(event) {
+          if (event.target == modal) {
+              modal.style.display = "none";
+              // Remove o fundo desfocado
+              document.querySelector(".fundo-desfocado-editar").remove();
+          }
+      }
+
+    // Implementa a lógica para salvar as alterações ao clicar no botão Salvar
+var salvarEdicaoButton = document.getElementById("salvarEdicaoGrupoDocumento");
+salvarEdicaoButton.onclick = function() {
+    // Obtém os novos dados do grupo editado
+    var novoCodigo = editCodigoInput.value;
+    var novoNome = editNomeInput.value;
+
+    // Cria um objeto com os dados atualizados para enviar ao servidor
+    var dadosAtualizados = {
+        id: grupo.id,
+        codigo: novoCodigo,
+        nome: novoNome
+    };
+
+    // Envia uma solicitação AJAX para atualizar os dados do grupo
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            // Atualiza a tabela após a edição bem-sucedida
+            carregarGruposDocumento();
+            // Fecha o modal
+            modal.style.display = "none";
+            // Remove o fundo desfocado
+            document.querySelector(".fundo-desfocado-editar").remove();
+        }
+    };
+    xhttp.open("POST", '{% url "cadastrar_grupo_documento" %}', true); // Use a URL correta da sua rota no Django
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(JSON.stringify(dadosAtualizados));
+}
+
+  }
+
+  // Função para fazer a solicitação AJAX para excluir um grupo de documentos
+  function excluirGrupoDocumento(grupo_id) {
+      // Confirmação do usuário antes de excluir o grupo de documentos
+      if (confirm("Tem certeza de que deseja excluir este grupo de documentos?")) {
+          // Envia uma solicitação AJAX para excluir o grupo de documentos
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+              if (this.readyState == 4 && this.status == 200) {
+                  // Atualiza a tabela após a exclusão bem-sucedida
+                  carregarGruposDocumento();
+              }
+          };
+          xhttp.open("POST", '{% url "cadastrar_grupo_documento" %}', true); // Use a URL correta da sua rota no Django
+          xhttp.setRequestHeader("Content-type", "application/json");
+          xhttp.send(JSON.stringify({id: grupo_id, excluir: true}));
+      }
+  }
+</script>
+
+
+<script>
+ // Função para carregar os grupos de documentos na tabela
+function carregarGruposDocumento() {
+    fetch('{% url "cadastrar_grupo_documento" %}', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const tableBody = document.getElementById('tabelaCorpoGruposDocumento');
+        tableBody.innerHTML = ''; // Limpa a tabela antes de adicionar os novos dados
+        data.grupo_documentos.forEach(grupo => {
+            const row = tableBody.insertRow();
+            const codigoCell = row.insertCell(0);
+            const nomeCell = row.insertCell(1);
+            const editarCell = row.insertCell(2);
+            const removerCell = row.insertCell(3);
+
+            codigoCell.textContent = grupo.codigo;
+            nomeCell.textContent = grupo.nome;
+
+            // Botão Editar
+            const editarButton = document.createElement('button');
+            editarButton.innerHTML = '<i class="bi bi-pencil-fill"></i>';
+            editarButton.addEventListener('click', function() {
+                editarGrupoDocumento(grupo);
+            });
+            editarCell.appendChild(editarButton);
+
+            // Botão Remover
+            const removerButton = document.createElement('button');
+            removerButton.innerHTML = '<i class="bi bi-trash3-fill"></i>';
+            removerButton.addEventListener('click', function() {
+                excluirGrupoDocumento(grupo.id);
+            });
+            removerCell.appendChild(removerButton);
+        });
+    })
+    .catch(error => {
+        console.error('Erro ao carregar grupos de documentos:', error);
+    });
+}
+
+window.addEventListener('load', function() {
+      preencherOpcoesGrupoDocumento();
+      carregarGruposDocumento();
+      carregarAreas();
+  });
+</script>
+
+
+
+
+<div id="tabelaTiposDocumentosForm" class="table-container">
+  <table>
+      <div>
+          <h1>TIPOS DE DOCUMENTOS</h1>
+      </div>
+      <div class="subheader3">
+          <button id="abrirFormularioTipoDocumento"><i class="bi bi-plus-circle-dotted"></i></button>
+          <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+          <select id="numLinhas" name="numLinhas">
+              <option value="" disabled selected hidden>NºLinhas</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="40">40</option>
+              <option value="100">100</option>
+          </select>
+      </div>
+      <thead>
+          <tr>
+              <th>Código</th>
+              <th>Grupo</th>
+              <th>Nome Documento</th>
+              <th>Obrigatório</th>
+              <th>Valor Legal</th>
+              <th>Validade</th>
+              <th>Tipo de Validade</th>
+              <th>Verificar Ass.</th>
+              <th>Exibe no Relatório</th>
+              <th>Situação Filtro</th>
+              <th>Editar</th>
+              <th>Remover</th>
+          </tr>
+      </thead>
+      <tbody id="tabelaCorpoTiposDocumento">
+          <!-- Linhas da tabela serão inseridas aqui -->
+      </tbody>
+  </table>
+</div>
+
+<div id="janelaCadastroTipoDocumento" class="modal" style="display: none;"method="post">
+  <div class="modal-content">
+    <h1 style="margin-bottom: 10px; padding: 10px;">
+      <span style="font-size: 90%;">Cadastro tipo de Documento</span> 
+      <span class="fechar">&times;</span>
+    </h1>
+      <input type="text" id="inputCodigoTipoDocumento" placeholder="Código">
+      <select id="selectGrupo" name="Grupo">
+        <option value="" disabled selected hidden>Grupo</option>
+        <!-- As opções serão preenchidas dinamicamente com JavaScript -->
+      </select>
+      <input type="text" id="inputNomeTipoDocumento" placeholder="Nome">
+      <select id="pcdSelect" name="pcdSelect">
+        <option value="" disabled selected hidden>PCD</option>
+        <option value="sim">SIM</option>
+        <option value="nao">NÃO</option>
+      </select>
+      <!-- Adicionando um contêiner para os selects -->
+      <div class="selects-container">
+        <select id="valorLegalTipoDocumento" name="Valor Legal">
+          <option value="" disabled selected hidden>Valor Legal</option>
+          <option value="sim">SIM</option>
+          <option value="nao">NÃO</option>
+        </select>
+        <select id="VerificarAssTipoDocumento" name="Verificar Assinatura">
+          <option value="" disabled selected hidden>Verificar Ass.</option>
+          <option value="sim">SIM</option>
+          <option value="nao">NÃO</option>
+        </select>
+        <select id="AuditoriaTipoDocumento" name="Auditoria">
+          <option value="" disabled selected hidden>Auditoria</option>
+          <option value="Interna">Interna</option>
+          <option value="Governamental">Governamental</option>
+        </select>
+      </div>
+      <!-- Fim do contêiner para os selects -->
+      <!-- Adicionando um contêiner para os selects -->
+      <div class="selects-container">
+      <input type="text" id="ValidadeTipoDocumento" placeholder="Válidade">
+      <select id="TipoValidadeTipoDocumento" name="Tipo de Validade">
+        <option value="" disabled selected hidden>Tipo de Validade</option>
+        <option value="dias">dias</option>
+        <option value="anos">anos</option>
+        <option value="meses">meses</option>
+      </select>
+      <select id="ExibeRelatorioComplianceTipoDocumento" name="Exibe Relatorio Compliance">
+        <option value="" disabled selected hidden>Exibe Relatorio Compliance</option>
+        <option value="sim">SIM</option>
+        <option value="nao">NÃO</option>
+      </select>
+      <select id="ListaSituacaoFiltroTipoDocumento" name="Lista Situação Filtro">
+        <option value="" disabled selected hidden>Lista Situação Filtro</option>
+        <option value="AMBOS">AMBOS</option>
+        <option value="ATIVOS">ATIVOS</option>
+        <option value="INATIVOS">INATIVOS</option>
+        <option value="AFASTADOS">AFASTADOS</option>
+      </select>
+      <select id="PrioridadeTipoDocumento" name="Prioridade">
+        <option value="" disabled selected hidden>Prioridade</option>
+        <option value="sim">SIM</option>
+        <option value="nao">NÃO</option>
+      </select>
+    </div>
+    <!-- Fim do contêiner para os selects -->
+
+    <div style="display: flex;">
+      <div class="checkObrg">
+        <h1>OBRIGÁTORIO
+        <input type="checkbox" id="selectAll">
+        <label for="selectAll">Selecionar Todos</label>
+      </h1>
+      </div>
+    </div>
+    
+    <div>
+      <button id="btnCadastrarTipoDocumento">Cadastrar</button>
+  </div>
+</div>
+
+
+<!-- Modal de edição de tipo de Documento -->
+<div id="modalEditarTipoDocumento" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h1>Editar Tipo de Documento</h1>
+    <label for="editCodigotipoDocumento">Código:</label>
+    <input type="text" id="editCodigotipoDocumento" name="editCodigotipoDocumento">
+    <label for="editGrupoDocumento">Grupo:</label>
+    <input type="text" id="editGrupoDocumento" name="editGrupoDocumento">
+    <label for="editNomeDocumento">Nome Documento:</label>
+    <input type="text" id="editNomeDocumento" name="editNomeDocumento">
+    <label for="editObrigatorio">Obrigatório:</label>
+    <input type="checkbox" id="editObrigatorio" name="editObrigatorio">
+    <label for="editValorLegal">Valor Legal:</label>
+    <input type="text" id="editValorLegal" name="editValorLegal">
+    <label for="editValidade">Validade:</label>
+    <input type="text" id="editValidade" name="editValidade">
+    <label for="editTipoValidade">Tipo de Validade:</label>
+    <input type="text" id="editTipoValidade" name="editTipoValidade">
+    <label for="editVerificarAss">Verificar Ass.:</label>
+    <input type="checkbox" id="editVerificarAss" name="editVerificarAss">
+    <label for="editExibeRelatorio">Exibe no Relatório:</label>
+    <input type="checkbox" id="editExibeRelatorio" name="editExibeRelatorio">
+    <label for="editSituacaoFiltro">Situação Filtro:</label>
+    <input type="text" id="editSituacaoFiltro" name="editSituacaoFiltro">
+    <button id="salvarCodigotipoDocumento">Salvar</button>
+  </div>
+</div>
+
+
+<script>
+  // Adiciona evento de teclado para detectar Ctrl+A
+document.addEventListener('keydown', function(event) {
+  if (event.ctrlKey && event.key === 'a') {
+    selectAllCheckboxes();
+  }
+});
+
+// Função para selecionar todos os checkboxes
+function selectAllCheckboxes() {
+  const checkboxes = document.querySelectorAll('.checkObrg input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    // Verifica se o ID do checkbox começa com 'check'
+    if (checkbox.id.startsWith('check')) {
+      checkbox.checked = true;
+    }
+  });
+}
+
+// Função para popular as checkboxes
+function popularCheckboxes(cargos) {
+  const container = document.querySelector('.checkObrg');
+  cargos.forEach(cargo => {
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `check${cargo.id}`;
+    checkbox.name = `check${cargo.id}`;
+    const label = document.createElement('label');
+    label.htmlFor = `check${cargo.id}`;
+    label.textContent = cargo.nome;
+    container.appendChild(checkbox);
+    container.appendChild(label);
+    container.appendChild(document.createElement('br')); // Adiciona quebra de linha
+  });
+
+  // Adiciona evento de clique para selecionar todos os checkboxes
+  const selectAllCheckbox = document.getElementById('selectAll');
+  selectAllCheckbox.addEventListener('click', function() {
+    selectAllCheckboxes();
+  });
+}
+
+  // Função para popular as checkboxes
+  function popularCheckboxes(cargos) {
+    const container = document.querySelector('.checkObrg');
+    cargos.forEach(cargo => {
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = `check${cargo.id}`;
+      checkbox.name = `check${cargo.id}`;
+      const label = document.createElement('label');
+      label.htmlFor = `check${cargo.id}`;
+      label.textContent = cargo.nome;
+      container.appendChild(checkbox);
+      container.appendChild(label);
+      container.appendChild(document.createElement('br')); // Adiciona quebra de linha
+    });
+
+    // Adiciona evento de clique para selecionar todos os checkboxes
+    const selectAllCheckbox = document.getElementById('selectAll');
+    selectAllCheckbox.addEventListener('click', function() {
+      const checkboxes = document.querySelectorAll('.checkObrg input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+      });
+    });
+  }
+
+  // Simula uma requisição AJAX para obter os dados da view
+  // Substitua esta parte com a lógica real de requisição AJAX na sua aplicação
+  const xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+      if (xhr.status === 200) {
+        const cargos = JSON.parse(xhr.responseText);
+        popularCheckboxes(cargos);
+      } else {
+        console.error('Erro ao carregar os cargos');
+      }
+    }
+  };
+  xhr.open('GET', '{% url "carregar_cargos" %}', true);
+  xhr.send();
+</script>
+
+
+<script>
+  // Abre a janela de cadastro de Tipo de Documento quando o botão é clicado
+  document.getElementById("abrirFormularioTipoDocumento").addEventListener("click", function() {
+      document.getElementById("janelaCadastroTipoDocumento").style.display = "block";
+      document.body.appendChild(document.createElement("div")).classList.add("fundo-desfocado"); // Adiciona o fundo desfocado dinamicamente
+  });
+  
+  // Fecha a janela de cadastro de Tipo de Documento quando o botão de fechar é clicado
+  document.querySelector("#janelaCadastroTipoDocumento .fechar").addEventListener("click", function() {
+      document.getElementById("janelaCadastroTipoDocumento").style.display = "none";
+      document.querySelector(".fundo-desfocado").remove(); // Remove o fundo desfocado
+  });
+</script>
+
+<script>
+  // Função para preencher as opções do select com os grupos de documento
+  function preencherOpcoesGrupoDocumento() {
+      var selectGrupo = document.getElementById("selectGrupo");
+  
+      // Limpa as opções atuais do select
+      selectGrupo.innerHTML = '';
+  
+      // Adiciona uma opção padrão desabilitada e oculta
+      var defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
+      defaultOption.hidden = true;
+      defaultOption.textContent = 'Grupo';
+      selectGrupo.appendChild(defaultOption);
+  
+      // Envia uma solicitação AJAX para obter os grupos de documento
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+              if (xhr.status === 200) {
+                  var data = JSON.parse(xhr.responseText);
+                  // Preenche as opções do select com os dados recebidos
+                  data.grupo_documentos.forEach(function(grupo) {
+                      var option = document.createElement('option');
+                      option.value = grupo.id;
+                      option.textContent = grupo.nome;
+                      selectGrupo.appendChild(option);
+                  });
+              } else {
+                  console.error('Erro ao obter os grupos de documento:', xhr.status);
+              }
+          }
+      };
+      xhr.open('GET', '{% url "cadastrar_grupo_documento" %}', true);
+      xhr.send();
+  }
+  
+  // Adicionando evento load para executar as duas funções
+ 
+  </script>
+  
+  <script>  
+   // Função para enviar os dados do formulário para o backend
+function cadastrarTipoDocumento() {
+    // Capturar o token CSRF do cookie
+    function getCSRFToken() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            .split('=')[1];
+        return cookieValue;
+    }
+
+    // Capturar os valores dos campos do formulário
+    const codigo = document.getElementById('inputCodigoTipoDocumento').value;
+    const nome = document.getElementById('inputNomeTipoDocumento').value;
+    const grupo_id = document.getElementById('selectGrupo').value; // Capturar o ID do grupo selecionado
+    const pcd = document.getElementById('pcdSelect').value;
+    const valor_legal = document.getElementById('valorLegalTipoDocumento').value;
+    const verifica_assinatura = document.getElementById('VerificarAssTipoDocumento').value;
+    const auditoria = document.getElementById('AuditoriaTipoDocumento').value;
+    const validade = document.getElementById('ValidadeTipoDocumento').value;
+    const tipo_validade = document.getElementById('TipoValidadeTipoDocumento').value;
+    const exibe_relatorio = document.getElementById('ExibeRelatorioComplianceTipoDocumento').value;
+    const lista_situacao = document.getElementById('ListaSituacaoFiltroTipoDocumento').value;
+    const prioridade = document.getElementById('PrioridadeTipoDocumento').value;
+    const cargos_selecionados = [];
+
+    
+    console.log('Valor de codigo recebido:', codigo);
+    console.log('Valor de nome recebido:', nome);
+    console.log('Valor de grupo_id recebido:', grupo_id);
+    console.log('Valor de pcd recebido:', pcd);
+    console.log('Valor de valor_legal recebido:', valor_legal);
+    console.log('Valor de verifica_assinatura recebido:', verifica_assinatura);
+    console.log('Valor de auditoria recebido:', auditoria);
+    console.log('Valor de validade recebido:', validade);
+    console.log('Valor de tipo_validade recebido:', tipo_validade);
+    console.log('Valor de exibe_relatorio recebido:', exibe_relatorio);
+    console.log('Valor de lista_situacao recebido:', lista_situacao);
+    console.log('Valor de prioridade recebido:', prioridade);
+
+
+// Capturar os IDs dos cargos selecionados
+const checkboxes = document.querySelectorAll('.checkObrg input[type="checkbox"]');
+checkboxes.forEach(checkbox => {
+    if (checkbox.checked) {
+        cargos_selecionados.push(checkbox.id.replace('check', '')); // Adiciona o ID do cargo selecionado
+    }
+});
+
+console.log('IDs dos cargos selecionados:', cargos_selecionados);
+
+// Montar o objeto com os dados a serem enviados para o backend
+const data = {
+    codigo: codigo,
+    nome: nome,
+    grupo_id: grupo_id, // Incluir o ID do grupo selecionado
+    pcd: pcd,
+    valor_legal: valor_legal,
+    verifica_assinatura: verifica_assinatura,
+    auditoria: auditoria,
+    validade: validade,
+    tipo_validade: tipo_validade,
+    exibe_relatorio: exibe_relatorio,
+    lista_situacao: lista_situacao,
+    prioridade: prioridade,
+    cargos_selecionados: cargos_selecionados
+};
+
+    // Obter o token CSRF
+    const csrftoken = getCSRFToken();
+
+    // Enviar os dados para o backend via requisição HTTP POST
+    fetch('{% url "cadastrar_tipodocumento" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken // Incluir o token CSRF nos cabeçalhos
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Processar a resposta do backend
+        if (data.status === 'success') {
+            alert(data.message); // Mostrar mensagem de sucesso
+        } else {
+            alert('Erro: ' + data.message); // Mostrar mensagem de erro
+        }
+    })
+    .catch((error) => {
+        console.error('Erro:', error);
+        alert('Erro ao enviar os dados para o servidor');
+    });
+}
+    
+    // Evento de clique no botão de cadastrar
+    document.getElementById('btnCadastrarTipoDocumento').addEventListener('click', cadastrarTipoDocumento);
+    </script>
+    
+
+  
+<script>
+  function formatarBooleanoParaUsuario(valor) {
+  return valor ? 'SIM' : 'NÃO';
+}
+function preencherTabelaTiposDocumentos(tiposDocumento) {
+    const tabelaCorpo = document.getElementById('tabelaCorpoTiposDocumento');
+    tabelaCorpo.innerHTML = ''; // Limpar o conteúdo da tabela antes de preencher
+
+    tiposDocumento.forEach(tipo => {
+        const row = document.createElement('tr');
+
+        const codigoCol = document.createElement('td');
+        codigoCol.textContent = tipo.codigo;
+        row.appendChild(codigoCol);
+
+        const grupoCol = document.createElement('td');
+        grupoCol.textContent = tipo.grupo_documento;
+        row.appendChild(grupoCol);
+
+        const nomeCol = document.createElement('td');
+        nomeCol.textContent = tipo.nome;
+        row.appendChild(nomeCol);
+
+        const obrigatorioCol = document.createElement('td');
+        obrigatorioCol.textContent = formatarBooleanoParaUsuario(tipo.obrigatorio);
+        row.appendChild(obrigatorioCol);
+
+        const valorLegalCol = document.createElement('td');
+        valorLegalCol.textContent = formatarBooleanoParaUsuario(tipo.valor_legal);
+        row.appendChild(valorLegalCol);
+
+        const validadeCol = document.createElement('td');
+        validadeCol.textContent = tipo.validade;
+        row.appendChild(validadeCol);
+
+        const tipoValidadeCol = document.createElement('td');
+        tipoValidadeCol.textContent = tipo.tipo_validade;
+        row.appendChild(tipoValidadeCol);
+
+        const verificarAssinaturaCol = document.createElement('td');
+        verificarAssinaturaCol.textContent = formatarBooleanoParaUsuario(tipo.verifica_assinatura);
+        row.appendChild(verificarAssinaturaCol);
+
+        const exibeRelatorioCol = document.createElement('td');
+        exibeRelatorioCol.textContent = formatarBooleanoParaUsuario(tipo.exibe_relatorio);
+        row.appendChild(exibeRelatorioCol);
+
+        const listaSituacaoCol = document.createElement('td');
+        listaSituacaoCol.textContent = tipo.lista_situacao;
+        row.appendChild(listaSituacaoCol);
+
+        const editarCol = document.createElement('td');
+        const editarButton = document.createElement('button');
+        editarButton.innerHTML = '<i class="bi bi-pencil-fill"></i>';
+        editarButton.classList.add('btn-editar');
+        editarButton.addEventListener('click', function() {
+            // Adicione aqui a ação a ser realizada quando o botão de editar for clicado
+        });
+        editarCol.appendChild(editarButton);
+        row.appendChild(editarCol);
+
+        const removerCol = document.createElement('td');
+        const removerButton = document.createElement('button');
+        removerButton.innerHTML = '<i class="bi bi-trash3-fill"></i>';
+        removerButton.classList.add('btn-remover');
+        removerButton.dataset.tipoDocumentoId = tipo.id; // Definir o ID do tipo de documento como um atributo de dados
+        removerButton.addEventListener('click', function() {
+            // Adicione aqui a ação a ser realizada quando o botão de remover for clicado
+            const tipoDocumentoId = this.dataset.tipoDocumentoId; // Obter o ID do tipo de documento do atributo de dados do botão
+            removerTipoDocumento(tipoDocumentoId, row);
+        });
+        removerCol.appendChild(removerButton);
+        row.appendChild(removerCol);
+
+        tabelaCorpo.appendChild(row);
+    });
+}
+
+
+
+// Função para carregar os tipos de documento quando a página é carregada
+document.addEventListener('DOMContentLoaded', function () {
+    fetch('{% url "cadastrar_tipodocumento" %}', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => preencherTabelaTiposDocumentos(data))
+    .catch(error => console.error('Erro ao carregar tipos de documento:', error));
+
+    // Adicionar evento de clique para cada botão de remoção
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('btn-remover')) {
+            const row = event.target.closest('tr'); // Encontre a linha pai do botão clicado
+            const tipoDocumentoId = row.dataset.tipoDocumentoId; // Obtenha o ID do tipo de documento
+            removerTipoDocumento(tipoDocumentoId, row);
+        }
+    });
+});
+
+function removerTipoDocumento(tipoDocumentoId, row) {
+    // Exibir uma mensagem de confirmação para o usuário
+    const confirmacao = confirm("Tem certeza que deseja excluir este tipo de documento?");
+    
+    // Se o usuário confirmar a exclusão
+    if (confirmacao) {
+        fetch('{% url "cadastrar_tipodocumento" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') // Adicione o token CSRF
+            },
+            body: JSON.stringify({ excluir: true, id: tipoDocumentoId }) // Marque como uma solicitação de exclusão e envie o ID
+        })
+        .then(response => {
+            if (response.ok) {
+                // Se a exclusão foi bem-sucedida, remova a linha da tabela
+                row.remove();
+            } else {
+                console.error('Erro ao excluir tipo de documento:', response.statusText);
+            }
+        })
+        .catch(error => console.error('Erro ao excluir tipo de documento:', error));
+    }
+}
+
+// Função auxiliar para obter o token CSRF
+function getCookie(name) {
+    const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return cookieValue ? cookieValue.pop() : '';
+}
+
+
+</script>
+
+
+
+<div id="tabelaOcupaçãoForm" class="table-container">
+  <table>
+    
+      <thead>
+          <div>
+              <h1>OCUPAÇÕES</h1>
+          </div>
+          <div class="subheader3">
+                    
+            <button id="abrirFormulario"><i class="bi bi-plus" style="font-size: 30px;"></i></button>
+            <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+       
+            <select id="numLinhas" name="numLinhas">
+              <option value="" disabled selected hidden> NºLinhas</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="40">40</option>
+              <option value="100">100</option>
+          </select>
+          
+        
+        <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+  </div>
+      <tr>
+        <th>Código</th>
+        <th>Nome</th>
+        <th>Editar</th>
+        <th>Remover</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
+
+    <div id="formularioCrud" class="form-container-OPTION" style="display: none;">
+        
+        <div class="subheader2">
+            <H1>Cadastrar Funcionário</H1>
+            <button id="fecharFormulario" class="teste3">&times;</button>
+        </div>
+        <form>
+            <div class="form-group">
+                <select id="Empresa" name="Empresa" placeholder="Empresa">
+                    <option value="">Empresa</option>
+                </select>
+                <select id="regional" name="regional">
+                    <option value="regional1_opcao1">Regional</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select id="unidade" name="unidade">
+                    <option value="unidade1_opcao1">Unidade</option>
+                </select>
+                <select id="regiao" name="regiao">
+                    <option value="regiao2_opcao1">Região</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" id="matricula" name="matricula" placeholder="Matrícula">
+                <input type="text" id="nome" name="nome" placeholder="Nome">
+                <input type="text" id="email" name="email" placeholder="E-mail">
+            </div>
+            <div class="form-group">
+                <input type="text" id="cargo" name="cargo" placeholder="Cargo">
+                <input type="date" id="admissao" name="admissao" placeholder="Data de Admissão">
+                <input type="text" id="cpf" name="cpf" placeholder="CPF">
+                <select id="pcd" name="pcd">
+                    <option value="pcd_sim">Sim</option>
+                    <option value="pcd_nao">Não</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select id="situacao" name="situacao">
+                    <option value="situacao_opcao1">Situação</option>
+                </select>
+                <select id="modo_ponto" name="modo_ponto">
+                    <option value="ponto_sim">Sim</option>
+                    <option value="ponto_não">não</option>
+                </select>
+                <select id="sistema_ponto" name="sistema_ponto">
+                    <option value="sistema_manual">BATE PONTO</option>
+                    <option value="sistema_biometrico">NÃO UTILIZA EFETIVIDADE</option>
+                    <option value="sistema_cartao">NÃO BATE PONTO</option>
+                </select>
+                <input type="date" id="desligamento" name="desligamento" placeholder="Data de Desligamento">
+            </div>
+            <div class="form-row button-row">
+              <button style="cursor:pointer" type="submit">Enviar</button>
+          </div>
+        </form>
+        </div>
+
+
+    <div id="SincronizarDocumentosForm" class="form-container">
+        <div class="subheader2">
+            <p>SINCRONIZAR DOCUMENTOS</p>
+        </div>
+        <form>
+            <div class="form-row button-row">
+                <button type="submit">SINCRONIZAR DOCUMENTOS</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="RessincronizarDocumentosForm" class="form-container">
+        <div class="subheader2">
+            <p>RESSINCRONIZAR DOCUMENTOS</p>
+        </div>
+        <form>
+            <div class="form-row button-row">
+                <button type="submit">RESSINCRONIZAR DOCUMENTOS</button>
+            </div>
+        </form>
+    </div>
+    <div id="AtualizarBancoForm" class="form-container">
+        <div class="subheader2">
+            <p>ATUALIZAR BANCO DE DADOS</p>
+        </div>
+        <form>
+            <div class="form-row button-row">
+                <button type="submit">ATUALIZAR BANCO DE DADOS</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="ErrosDepartamentosForm" class="form-container">
+      <div class="subheader2">
+          <p>ERROS DEPARTAMENTOS</p>
+      </div>
+      <form>
+          <div class="form-row button-row">
+              <button type="submit">Pesquisar</button>
+          </div>
+      </form>
+  </div>
+
+  <div id="ErrosRHForm" class="form-container">
+    <div class="subheader2">
+        <p>ERROS RH</p>
+    </div>
+    <form>
+        <div class="form-row button-row">
+            <button type="submit">Pesquisar</button>
+        </div>
+    </form>
+</div>
+<div id="ApagarDocumentoForm" class="form-container">
+  <div class="subheader2">
+      <p>APAGAR DOCUMENTO</p>
+      
+  </div>
+  <label for="texto">Informe as nomenclaturas abaixo separadas por ';'</label><br>
+  <label for="texto">Ex: 00000001_NOME_123456789_01_112_00000000_00_0001.PDF; 00000001_NOME_0123456789_01_113_00000000_00_0002.PDF</label><br>
+    <input type="text" id="texto" name="texto">
+  <form>
+      <div class="form-row button-row">
+          <button type="submit">APAGAR</button>
+      </div>
+  </form>
+</div>
+<div id="DocumentosApagadosForm" class="form-container">
+  <div class="subheader2">
+      <p>DOCUMENTOS APAGADOS</p>
+  </div>
+  <form>
+      <div class="form-row button-row">
+          <button type="submit">Pesquisar</button>
+      </div>
+  </form>
+</div>
+
+
+
+
+<div id="tabelausuariosForm" class="table-container">
+  <table>
+    
+      <thead>
+          <div>
+              <h1>USUÁRIOS</h1>
+          </div>
+          <div class="subheader3">
+                    
+            <button id="abrirFormulario"><i class="bi bi-plus" style="font-size: 30px;"></i></button>
+            <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+       
+            <select id="numLinhas" name="numLinhas">
+              <option value="" disabled selected hidden> NºLinhas</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="40">40</option>
+              <option value="100">100</option>
+          </select>
+          
+        
+        <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+  </div>
+      <tr>
+        <th>Código</th>
+        <th>Nome</th>
+        <th>Editar</th>
+        <th>Remover</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
+
+
+<div id="tabelaOcupaçãoForm" class="table-container">
+  <table>
+    
+      <thead>
+          <div>
+              <h1>OCUPAÇÕES</h1>
+          </div>
+          <div class="subheader3">
+                    
+            <button id="abrirFormulario"><i class="bi bi-plus" style="font-size: 30px;"></i></button>
+            <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+       
+            <select id="numLinhas" name="numLinhas">
+              <option value="" disabled selected hidden> NºLinhas</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="40">40</option>
+              <option value="100">100</option>
+          </select>
+          
+        
+        <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+  </div>
+      <tr>
+        <th>Código</th>
+        <th>Nome</th>
+        <th>Editar</th>
+        <th>Remover</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
+<div id="tabelaPermissõesForm" class="table-container">
+  <table>
+    
+      <thead>
+          <div>
+              <h1>PERMISSÕES</h1>
+          </div>
+          <div class="subheader3">
+                    
+            <button id="abrirFormulario"><i class="bi bi-plus" style="font-size: 30px;"></i></button>
+            <input type="text" id="pesquisa" name="pesquisa" placeholder="Digite sua pesquisa...">
+       
+            <select id="numLinhas" name="numLinhas">
+              <option value="" disabled selected hidden> NºLinhas</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="40">40</option>
+              <option value="100">100</option>
+          </select>
+          
+        
+        <button  id="downloadIcon"> <i class="bi bi-download" style="font-size: 25px;"></i> </button>
+  </div>
+      <tr>
+        <th>Código</th>
+        <th>Nome</th>
+        <th>QTD Empresas</th>
+        <th>QTD Regionais</th>
+        <th>QTD Unidades</th>
+        <th>QTD Paginas</th>
+        <th>QTD menus</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Unidade"></td>
+        <td data-label="Matricula"></td>
+        <td data-label="Nome"></td>
+        <td data-label="Cargo"></td>
+        <td data-label="Admissão"></td>
+        <td data-label="Situação"></td>
+        <td data-label="Desligamento"></td>
+        <td>
+          <button><i class="bi bi-pencil-fill"></i></button>
+        </td>
+        <td>
+          <button><i class="bi bi-trash3-fill"></i></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<div id="AlteraSenhaForm" class="form-container">
+  <div class="subheader2">
+      <p>ALTERAR SENHA</p>
+  </div>
+     
+      <input type="text" id="senha_atual" name="senha_atual" required placeholder="Senha atual"><br>
+  
+      
+      <input type="text" id="nova_senha" name="nova_senha" required placeholder="Nova senha"><br>
+  
+      
+      <input type="text" id="confirmar_senha" name="confirmar_senha" required placeholder="Confirmar senha"><br>
+  
+      <div class="form-row button-row">
+        <button type="submit">ALTERAR</button>
+    </div>
+</div>
+
+
+<script>
+  function sincronizarDocumentos() {
+      // Função para obter o valor de um cookie por nome
+      function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+  
+      // Evento de clique para atualizar o ponto
+      document.getElementById('atualizarPonto').addEventListener('click', function() {
+          fetch("{% url 'atualizar_controle_ponto' %}", {  
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': getCookie('csrftoken')
+              }
+          })
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Falha na rede com status: ' + response.status);
+              }
+              return response.json();
+          })
+          .then(data => {
+              document.getElementById('statusUpdate').textContent = data.status;
+          })
+          .catch(error => {
+              console.error('Erro ao atualizar os cartões de ponto:', error);
+              document.getElementById('statusUpdate').textContent = 'Erro ao atualizar: ' + error.message;
+          });
+      });
+  
+      // Evento de clique para carregar documentos vencidos
+      document.getElementById('carregarDocumentosBtn').addEventListener('click', function() {
+          fetch("{% url 'lista_vencidos' %}")
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Falha na rede com status: ' + response.status);
+              }
+              return response.json();
+          })
+          .then(data => {
+              const lista = document.getElementById('listaDocumentos');
+              lista.innerHTML = '';
+              data.forEach(doc => {
+                  const item = document.createElement('li');
+                  item.innerHTML = `Matrícula: ${doc.matricula}, Nome: ${doc.nome}, CPF: ${doc.cpf}, Cargo: ${doc.cargo}, Unidade: ${doc.unidade}, Regional: ${doc.regional}, Empresa: ${doc.empresa}, Data de Vencimento: ${doc.data_vencimento}`;
+                  lista.appendChild(item);
+              });
+          })
+          .catch(error => {
+              console.error('Erro ao carregar documentos vencidos:', error);
+              document.getElementById('listaDocumentos').innerHTML = 'Erro ao carregar: ' + error.message;
+          });
+      });
+  
+      // Evento de clique para carregar documentos a vencer
+      document.getElementById('carregarDocumentosBtn1').addEventListener('click', function() {
+          fetch("{% url 'lista_a_vencer' %}")
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Falha na rede com status: ' + response.status);
+              }
+              return response.json();
+          })
+          .then(data => {
+              const listasVencimento = {
+                  '15_dias': document.getElementById('listaVencimento15'),
+                  '30_dias': document.getElementById('listaVencimento30'),
+                  '45_dias': document.getElementById('listaVencimento45'),
+                  '60_dias': document.getElementById('listaVencimento60'),
+                  '90_dias': document.getElementById('listaVencimento90'),
+              };
+  
+              Object.values(listasVencimento).forEach(lista => lista.innerHTML = '');
+  
+              Object.entries(data).forEach(([categoria, documentos]) => {
+                  documentos.forEach(doc => {
+                      const item = document.createElement('li');
+                      item.innerHTML = `Matrícula: ${doc.matricula}, Nome: ${doc.nome}, CPF: ${doc.cpf}, Cargo: ${doc.cargo}, Unidade: ${doc.unidade}, Regional: ${doc.regional}, Empresa: ${doc.empresa}, Data de Vencimento: ${doc.data_vencimento}`;
+                      listasVencimento[categoria].appendChild(item);
+                  });
+              });
+          })
+          .catch(error => {
+              console.error('Erro ao carregar documentos a vencer:', error);
+              document.getElementById('listaVencimento15').innerHTML = 'Erro ao carregar: ' + error.message;
+          });
+      });
+  
+      // Evento de clique para carregar documentos de auditoria
+      document.getElementById('carregarDocumentosAuditoriaBtn').addEventListener('click', function() {
+          fetch("{% url 'documentos_auditorias' %}", {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': getCookie('csrftoken')
+              }
+          })
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Falha na rede com status: ' + response.status);
+              }
+              return response.json();
+          })
+          .then(data => {
+              document.getElementById('statusUpdateAuditoria').textContent = 'Documentos de auditoria processados: ' + data.documentos_processados;
+          })
+          .catch(error => {
+              console.error('Erro ao carregar documentos de auditoria:', error);
+              document.getElementById('statusUpdateAuditoria').textContent = 'Erro ao carregar: ' + error.message;
+          });
+      });
+  
+      // Evento de clique para pesquisa de documentos existentes
+      $('#searchForm').submit(function(event) {
+          event.preventDefault();
+  
+          var empresa = $('#empresa').val();
+          var regional = $('#regional').val();
+          var unidade = $('#unidade').val();
+          var nome = $('#nome').val();
+  
+          var searchData = {
+              empresa: empresa,
+              regional: regional,
+              unidade: unidade,
+              nome: nome
+          };
+  
+          $.ajax({
+              url: "{% url 'documentos_existentes' %}",
+              type: "GET",
+              data: searchData,
+              success: function(response) {
+                  console.log(response);
+              },
+              error: function(xhr, status, error) {
+                  console.error(error);
+              }
+          });
+      });
+  
+      // Função para fazer a solicitação POST para o endpoint de atualização de ASO
+      function atualizarASO() {
+          const csrftoken = getCookie('csrftoken');
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', urlAtualizarASO, true);
+          xhr.setRequestHeader('X-CSRFToken', csrftoken);
+          xhr.onload = function () {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                  console.log('Atualização iniciada com sucesso!');
+              } else {
+                  console.error('Erro ao iniciar atualização: ', xhr.statusText);
+              }
+          };
+          xhr.onerror = function () {
+              console.error('Erro de rede ao iniciar atualização.');
+          };
+          xhr.send();
+      }
+  
+      // Associa o evento de clique do botão ao handler atualizarASO
+      document.addEventListener('DOMContentLoaded', function () {
+          const botaoAtualizar = document.querySelector('button#atualizarASO');
+          if (botaoAtualizar) {
+              botaoAtualizar.addEventListener('click', function(event) {
+                  event.preventDefault();
+                  atualizarASO();
+              });
+          }
+      });
+  }
+  
+  // Chama a função sincronizarDocumentos quando o botão "Sincronizar Documentos" for clicado
+  document.getElementById('sincronizarDocumentosBtn').addEventListener('click', function() {
+      sincronizarDocumentos();
+  });
+  </script>
+
+    <script src="{% static 'bootstrap/js/src/configuracao.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.4/xlsx.full.min.js"></script>
+
+</div>
+{% endblock %}
+

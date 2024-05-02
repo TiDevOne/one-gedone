@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Pendências ASO</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+
+    <a href="{% url 'CarregarRelatorioPendenteASOView' %}">Link</a>
+</head>
+<body>
+    <h1>Relatório de Pendências ASO</h1>
+    <button onclick="carregarDadosASO('401')">Carregar Admissional</button>
+    <button onclick="carregarDadosASO('402')">Carregar Demissional</button>
+    <button onclick="carregarDadosASO('403')">Carregar Periódico</button>
+    <table id="dadosASO">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Matrícula</th>
+                <th>CPF</th>
+                <th>Empresa</th>
+                <th>Regional</th>
+                <th>Unidade</th>
+                <th>Cargo</th>
+                <th>Admissão</th>
+                <th>Desligamento</th>
+                <th>Status</th>
+                <th>Tipo de Documento</th>
+                <th>ASO Existente</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dados serão inseridos aqui -->
+        </tbody>
+    </table>
+
+    <script>
+        function carregarDadosASO(tipoAso) {
+            $.ajax({
+                url: "{% url 'carregar_relatorio_pendete_asos' %}" + tipoAso,
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    const tabela = $('#dadosASO tbody');
+                    tabela.empty(); // Limpa os dados antigos da tabela
+                    data.forEach(pendente => {
+                        const linha = `<tr>
+                            <td>${pendente.id}</td>
+                            <td>${pendente.nome}</td>
+                            <td>${pendente.matricula}</td>
+                            <td>${pendente.cpf}</td>
+                            <td>${pendente.empresa}</td>
+                            <td>${pendente.regional}</td>
+                            <td>${pendente.unidade}</td>
+                            <td>${pendente.cargo}</td>
+                            <td>${pendente.admissao}</td>
+                            <td>${pendente.desligamento}</td>
+                            <td>${pendente.status}</td>
+                            <td>${pendente.tipo_documento}</td>
+                            <td>${pendente.aso_existente}</td>
+                        </tr>`;
+                        tabela.append(linha);
+                    });
+                },
+                error: function(error) {
+                    console.error('Erro ao carregar dados:', error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

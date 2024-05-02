@@ -1,0 +1,865 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href='{% static "\bootstrap\css\dossie.css" %}'>
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="{% static 'bootstrap/js/src/dossie.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <div class="subheader2">
+      <p>DOSSIÊ</p>
+  </div>
+ 
+  <form id="PesquisaFuncionarioForm">
+<div class="floating-labels-form">    
+<div class="form-row">
+    <select id="empresa" name="Empresa" required>
+        <option value="" disabled selected hidden>Empresa</option>
+    </select>
+    <label for="empresa">Empresa</label>
+</div>
+
+<div class="form-row">
+    <select id="Regional" name="Regional" required>
+        <option value="" disabled selected hidden>Regional</option>
+    </select>
+    <label for="Regional">Regional</label>
+</div>
+
+<div class="form-row">
+    <select id="unidade" name="unidade" required>
+        <option value="" disabled selected hidden>Unidade</option>
+    </select>
+    <label for="unidade">Unidade</label>
+</div>
+
+<div class="form-row">
+    <input type="text" id="inputNome" placeholder=" " required>
+    <label for="inputNome">Digite o nome</label>
+</div>
+
+<div class="form-row">
+    <input type="text" id="inputMatricula" placeholder=" " required>
+    <label for="inputMatricula">Digite a matrícula</label>
+</div>
+
+<div class="form-row">
+    <input type="text" id="inputCPF" placeholder=" " required>
+    <label for="inputCPF">Digite o CPF</label>
+</div>
+
+<div class="form-row">
+    <select id="Cargo" name="Cargo" required onchange="carregarCargos()">
+        <option value="" disabled selected hidden>Cargo</option>
+    </select>
+    <label for="Cargo">Cargo</label>
+</div>
+
+<div class="form-row">
+    <select id="situação" name="situação" required onchange="carregarSituacoes()">
+        <option value="" disabled selected hidden>Situação</option>
+    </select>
+    <label for="situação">Situação</label>
+</div>
+
+<div class="form-row">
+    <input type="date" id="admissao" name="admissao" placeholder=" " required>
+    <label for="admissao">Admissão</label>
+</div>
+
+<div class="form-row">
+    <input type="date" id="desligamento" name="desligamento" placeholder=" " required>
+    <label for="desligamento">Desligamento</label>
+</div>
+
+
+<div class="form-row button-row">
+<!-- Adicione um id ao botão Pesquisar -->
+<button type="submit" id="pesquisarBtn">Pesquisar</button>
+</div>
+</div>
+</form>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div id="sidebar" class="sidebar">
+<span class="close-btn" onclick="closeSidebar()">&times;</span>
+
+<div class="table-container">
+  <div class="subheader3">
+    <p>DOSSIÊ</p>
+</div>
+<div class="export-buttons">
+  <select id="exportFormat">
+      <option value="xlsx">Exportar para XLSX</option>
+      <option value="csv">Exportar para CSV</option>
+      <option value="pdf">Exportar para PDF</option>
+  </select>
+  <button onclick="authenticateDownload()"><i class="bi bi-download"></i></button>
+</div>
+
+<div class="search-container">
+  <input type="text" id="searchInput" placeholder="Pesquisar...">
+</div>
+<div class="rows-per-page">
+    <select id="rowsPerPage" required onchange="changeRowsPerPage()">
+        <option value="" disabled hidden>Linhas por página</option>
+        <option value="8">8</option>
+        <option value="10" selected>10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+        <option value="40">40</option>
+        <option value="100">100</option>
+    </select>
+    <label for="rowsPerPage">Linhas por página:</label>
+</div>
+
+    
+    <table id="tabela-resultados">
+      <thead>
+        <tr>
+          <th>Situação</th>
+          <th>Matrícula</th>
+          <th>CPF</th>
+          <th>Colaborador</th>
+          <th>Admissão</th>
+          <th>Desligamento</th>
+          <th>Empresa</th>
+          <th>Regional</th>
+          <th>Unidade</th>
+          <th>Cargo</th>
+          <th>Ver Dossiê</th>
+        </tr>
+    </thead>
+        <tbody>
+            <!-- Os resultados serão inseridos aqui -->
+        </tbody>
+    </table>
+    <div id="paginacao"></div> <!-- Div para os controles de paginação -->
+</div>
+</div>
+<div id="loader" class="loader"></div>
+<script>
+    // Variáveis globais para armazenar as seleções do usuário
+    let selectedEmpresa = '';
+    let selectedRegional = '';  
+    let selectedUnidade = '';
+
+    // Função para carregar os dados de colaboradores, regiões, regionais e unidades
+   // Função para carregar os dados de colaboradores, regiões, regionais e unidades
+function carregarDados() {
+    fetch('{% url "carregar_dados" %}')
+        .then(response => response.json())
+        .then(data => {
+            // Limpar selects e adicionar opções iniciais
+            const selectEmpresa = document.getElementById('empresa');
+            const selectRegional = document.getElementById('Regional');
+            const selectUnidade = document.getElementById('unidade');
+
+            // Salvar opção selecionada antes de limpar os selects
+            const selectedEmpresaValue = selectEmpresa.value;
+            const selectedRegionalValue = selectRegional.value;
+            const selectedUnidadeValue = selectUnidade.value;
+
+            selectEmpresa.innerHTML = '';
+            selectRegional.innerHTML = '';
+            selectUnidade.innerHTML = '';
+
+            // Adicionar opções iniciais
+            selectEmpresa.innerHTML = '<option value="" disabled>Empresa</option>';
+            selectRegional.innerHTML = '<option value="" disabled>Regional</option>';
+            selectUnidade.innerHTML = '<option value="" disabled>Unidade</option>';
+
+            // Preencher os selects com dados
+            data.forEach(colaborador => {
+                // Preencher select de região
+                if (!selectEmpresa.querySelector(`option[value="${colaborador.empresa}"]`)) {
+                    const option = document.createElement('option');
+                    option.value = colaborador.empresa;
+                    option.textContent = colaborador.empresa;
+                    selectEmpresa.appendChild(option);
+                }
+
+                // Preencher select de regional se uma região estiver selecionada
+                if (selectedEmpresaValue && colaborador.empresa === selectedEmpresaValue) {
+                    if (!selectRegional.querySelector(`option[value="${colaborador.regional}"]`)) {
+                        const option = document.createElement('option');
+                        option.value = colaborador.regional;
+                        option.textContent = colaborador.regional;
+                        selectRegional.appendChild(option);
+                    }
+                }
+
+                // Preencher select de unidade se uma regional estiver selecionada
+                if (selectedRegionalValue && colaborador.regional === selectedRegionalValue) {
+                    if (!selectUnidade.querySelector(`option[value="${colaborador.unidade}"]`)) {
+                        const option = document.createElement('option');
+                        option.value = colaborador.unidade;
+                        option.textContent = colaborador.unidade;
+                        selectUnidade.appendChild(option);
+                    }
+                }
+            });
+
+            // Manter a opção selecionada visível após o carregamento dos dados
+            selectEmpresa.value = selectedEmpresaValue;
+            selectRegional.value = selectedRegionalValue;
+            selectUnidade.value = selectedUnidadeValue;
+        })
+        .catch(error => console.error('Erro ao carregar os dados:', error));
+}
+
+
+    // Carregar os dados quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        carregarDados();
+    });
+
+    // Adicionar evento onchange para o select de região
+    document.getElementById('empresa').addEventListener('change', function() {
+        selectedEmpresa = this.value;
+        selectedRegional = ''; // Limpar seleção de regional
+        selectedUnidade = ''; // Limpar seleção de unidade
+        carregarDados();
+    });
+
+    // Adicionar evento onchange para o select de regional
+    document.getElementById('Regional').addEventListener('change', function() {
+        selectedRegional = this.value;
+        selectedUnidade = ''; // Limpar seleção de unidade
+        carregarDados();
+    });
+
+    // Adicionar evento onchange para o select de unidade
+    document.getElementById('unidade').addEventListener('change', function() {
+        selectedUnidade = this.value;
+    });
+
+</script>
+
+  
+
+
+<script>
+    
+// Espera o DOM ser carregado
+document.addEventListener('DOMContentLoaded', function() {
+    // Chamar as funções de carregamento inicial
+    carregarCargos();
+    carregarSituacoes();
+   
+});
+
+
+// Função para carregar as opções do select de Cargo
+function carregarCargos() {
+var selectCargo = document.getElementById("Cargo");
+
+selectCargo.addEventListener('change', function() {
+  var selectedValue = selectCargo.value;
+  selectCargo.innerHTML = ''; // Limpa todas as opções existentes
+  var option = document.createElement("option");
+  option.value = selectedValue;
+  option.text = selectedValue;
+  selectCargo.appendChild(option);
+});
+
+fetch('{% url "carregar_cargos" %}')
+  .then(response => response.json())
+  .then(data => {
+      data.forEach(cargo => {
+          var option = document.createElement("option");
+          option.value = cargo.nome; // Configura o valor para o nome do cargo
+          option.text = cargo.nome; // Configura o texto para o nome do cargo
+          selectCargo.appendChild(option);
+      });
+  })
+  .catch(error => console.error('Erro ao carregar os cargos:', error));
+}
+
+// Função para carregar as opções do select de Situação
+function carregarSituacoes() {
+    var selectSituacao = document.getElementById("situação");
+    var situacoesUnicas = new Set(); // Criar um conjunto para armazenar situações únicas
+
+    selectSituacao.addEventListener('change', function() {
+        var selectedValue = selectSituacao.value;
+        selectSituacao.innerHTML = ''; // Limpa todas as opções existentes
+        var option = document.createElement("option");
+        option.value = selectedValue;
+        option.text = selectedValue;
+        selectSituacao.appendChild(option);
+    });
+
+    fetch('{% url "carregar_situacoes" %}')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(situacao => {
+                situacoesUnicas.add(situacao.nome); // Adiciona apenas situações únicas ao conjunto
+            });
+            // Adiciona as opções únicas ao seletor
+            situacoesUnicas.forEach(situacao => {
+                var option = document.createElement("option");
+                option.value = situacao; // Configura o valor para o nome da situação
+                option.text = situacao; // Configura o texto para o nome da situação
+                selectSituacao.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Erro ao carregar as situações:', error));
+}
+
+</script>
+
+<script>
+    // Variáveis globais para armazenar os nomes, matrículas e CPFs carregados
+    var nomesCarregados = [];
+    var matriculasCarregadas = [];
+    var cpfsCarregados = [];
+    var dadosCarregados = false; // Variável para verificar se os dados já foram carregados
+    
+    // Função para carregar os nomes, as matrículas e os CPFs
+    function carregarNomes() {
+        if (!dadosCarregados) { // Verifica se os dados já foram carregados
+            fetch('{% url "carregar_colaborador" %}')
+                .then(response => response.json())
+                .then(data => {
+                    // Armazena os nomes, as matrículas e os CPFs carregados nas variáveis globais
+                    nomesCarregados = data.map(colaborador => colaborador.nome.trim().toUpperCase());
+                    matriculasCarregadas = data.map(colaborador => colaborador.matricula.trim().toUpperCase());
+                    cpfsCarregados = data.map(colaborador => colaborador.cpf.trim().toUpperCase());
+                    dadosCarregados = true; // Define que os dados foram carregados
+                    console.log("Nomes carregados:", nomesCarregados);
+                    console.log("Matrículas carregadas:", matriculasCarregadas);
+                    console.log("CPFs carregados:", cpfsCarregados);
+                })
+                .catch(error => console.error('Erro ao carregar os nomes, as matrículas e os CPFs:', error));
+        }
+    }
+    
+    // Event listener para o botão de pesquisa
+    document.getElementById('pesquisarBtn').addEventListener('click', function(event) {
+        event.preventDefault(); // Previne o comportamento padrão do botão
+        pesquisar(); // Chama a função de pesquisa
+    });
+    
+    // Função para verificar se há associação entre nome e CPF
+    function verificarAssociacaoNomeCPF(inputNome, inputCPF) {
+        return nomesCarregados.includes(inputNome) && cpfsCarregados.includes(inputCPF);
+    }
+    
+    // Função para verificar se há associação entre nome e matrícula
+    function verificarAssociacaoNomeMatricula(inputNome, inputMatricula) {
+        return nomesCarregados.includes(inputNome) && matriculasCarregadas.includes(inputMatricula);
+    }
+    
+    // Função para verificar se há associação entre matrícula e CPF
+    function verificarAssociacaoMatriculaCPF(inputMatricula, inputCPF) {
+        return matriculasCarregadas.includes(inputMatricula) && cpfsCarregados.includes(inputCPF);
+    }
+    
+    // Função para verificar se há associação entre nome, matrícula e CPF
+    function verificarAssociacaoNomeMatriculaCPF(inputNome, inputMatricula, inputCPF) {
+        return nomesCarregados.includes(inputNome) && matriculasCarregadas.includes(inputMatricula) && cpfsCarregados.includes(inputCPF);
+    }
+    
+    // Função para realizar a pesquisa
+   // Função para realizar a pesquisa
+function pesquisar() {
+    var inputNome = document.getElementById("inputNome").value.trim().toUpperCase();
+    var inputMatricula = document.getElementById("inputMatricula").value.trim().toUpperCase();
+    var inputCPF = document.getElementById("inputCPF").value.trim().toUpperCase();
+
+    // Verificar se o inputNome não está vazio e há correspondência parcial com algum nome carregado
+    if (inputNome && !inputMatricula && !inputCPF) {
+        var resultados = nomesCarregados.filter(nome => nome.includes(inputNome));
+        if (resultados.length > 0) {
+            // Se houver resultados, exiba-os
+            openSidebar();
+        } else {
+            alert("Não foram encontrados resultados para o nome inserido.");
+        }
+    } else if (!inputNome && inputMatricula && !inputCPF && matriculasCarregadas.includes(inputMatricula)) {
+        openSidebar();
+    } else if (!inputNome && !inputMatricula && inputCPF && cpfsCarregados.includes(inputCPF)) {
+        openSidebar();
+    } else if (inputNome && inputMatricula && !inputCPF && verificarAssociacaoNomeMatricula(inputNome, inputMatricula)) {
+        openSidebar();
+    } else if (inputNome && !inputMatricula && inputCPF && verificarAssociacaoNomeCPF(inputNome, inputCPF)) {
+        openSidebar();
+    } else if (!inputNome && inputMatricula && inputCPF && verificarAssociacaoMatriculaCPF(inputMatricula, inputCPF)) {
+        openSidebar();
+    } else if (inputNome && inputMatricula && inputCPF && verificarAssociacaoNomeMatriculaCPF(inputNome, inputMatricula, inputCPF)) {
+        openSidebar();
+    } else if (inputCPF && inputMatricula && !inputNome && verificarAssociacaoMatriculaCPF(inputMatricula, inputCPF)) {
+        openSidebar();
+    } else if (inputNome && inputCPF && !inputMatricula && verificarAssociacaoNomeCPF(inputNome, inputCPF)) {
+        openSidebar();
+    } else {
+        alert("Os dados informados não correspondem a uma associação válida.");
+    }
+}
+
+    // Carregar os nomes, as matrículas e os CPFs quando a página for carregada
+    document.addEventListener('DOMContentLoaded', function() {
+        carregarNomes();
+    });
+    </script>
+    
+
+    <script>
+
+        function openSidebar() {
+          document.getElementById("sidebar").classList.add("open");
+        }
+        
+        function closeSidebar() {
+          document.getElementById("sidebar").classList.remove("open");
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+            var pageSize = 15;
+            var currentPage = 1;
+            var colaboradores = []; // Assumindo que você tenha essa lista de colaboradores populada em algum lugar do seu código
+            var totalPages = 1; // Inicializando totalPages com 1
+        
+            function showPage(pageNumber, colaboradores) {
+    var startIndex = (pageNumber - 1) * pageSize;
+    var endIndex = Math.min(startIndex + pageSize, colaboradores.length);
+    var tableBody = document.querySelector("#tabela-resultados tbody");
+    tableBody.innerHTML = "";
+
+    for (var i = startIndex; i < endIndex; i++) {
+        var colaborador = colaboradores[i];
+        var row = document.createElement("tr");
+        row.innerHTML = "<td>" + colaborador.situacao + "</td>" +
+            "<td>" + colaborador.matricula + "</td>" +
+            "<td>" + colaborador.cpf + "</td>" +
+            "<td>" + colaborador.nome + "</td>" +
+            "<td>" + colaborador.admissao + "</td>" +
+            "<td>" + colaborador.desligamento + "</td>" +
+            "<td>" + colaborador.empresa + "</td>" +
+            "<td>" + colaborador.regional + "</td>" +
+            "<td>" + colaborador.unidade + "</td>" +
+            "<td>" + colaborador.cargo + "</td>"; // Adiciona a coluna Cargo
+
+        // Cria o elemento <td> que contém o ícone de busca e adiciona o manipulador de eventos de clique
+        var searchIconCell = document.createElement("td");
+        var searchIcon = document.createElement("i");
+        searchIcon.classList.add("bi", "bi-search");
+        searchIcon.addEventListener("click", function() {
+            // Obtém os dados da linha selecionada
+            var rowData = [];
+            var cells = this.closest("tr").querySelectorAll("td");
+            cells.forEach(function(cell) {
+                rowData.push(cell.textContent);
+            });
+
+            var situacao = rowData[0];
+            var matricula = rowData[1];
+            var cpf = rowData[2];
+            var colaborador = rowData[3];
+            var admissao = rowData[4];
+            var desligamento = rowData[5];
+            var regional = rowData[6]; // Adiciona a regional à lista de informações
+            var unidade = rowData[7]; // Adiciona a unidade à lista de informações
+            var cargo = rowData[8]; // Adiciona o cargo à lista de informações
+
+            var url = "{% url 'dados_pessoais' %}?situacao=" + situacao + "&matricula=" + matricula + "&cpf=" + cpf + "&colaborador=" + colaborador + "&admissao=" + admissao + "&desligamento=" + desligamento + "&regional=" + regional + "&unidade=" + unidade + "&cargo=" + cargo; // Adiciona o cargo à URL
+            window.location.href = url;
+        });
+        searchIconCell.appendChild(searchIcon);
+        row.appendChild(searchIconCell);
+
+        tableBody.appendChild(row);
+    }
+}
+
+        
+            // Função para calcular o número total de páginas com base na quantidade de colaboradores e tamanho da página
+            function calculateTotalPages(colaboradores) {
+                totalPages = Math.ceil(colaboradores.length / pageSize);
+            }
+        
+            // Função para criar os controles de paginação
+            function createPaginationControls() {
+                var paginationDiv = document.getElementById("paginacao");
+                paginationDiv.innerHTML = "";
+        
+                // Adiciona botão para voltar para a página anterior
+                var prevPageButton = document.createElement("button");
+                prevPageButton.textContent = "<";
+                prevPageButton.classList.add("pagination-button", "prev-page-button");
+                prevPageButton.addEventListener("click", function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        showPage(currentPage, colaboradores);
+                        createPaginationControls();
+                    }
+                });
+                paginationDiv.appendChild(prevPageButton);
+        
+                // Exibe a página atual e o número total de páginas
+                var pageInfo = document.createElement("span");
+                pageInfo.textContent = currentPage + "/" + totalPages + "  ";
+                paginationDiv.appendChild(pageInfo);
+        
+                // Adiciona botão para avançar para a próxima página
+                var nextPageButton = document.createElement("button");
+                nextPageButton.textContent = ">";
+                nextPageButton.classList.add("pagination-button", "next-page-button");
+                nextPageButton.addEventListener("click", function() {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        showPage(currentPage, colaboradores);
+                        createPaginationControls();
+                    }
+                });
+                paginationDiv.appendChild(nextPageButton);
+            }
+        
+            // Função para buscar resultados dos colaboradores
+            function fetchResultados() {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "{% url 'listar_resultados_dossie' %}", true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var data = JSON.parse(xhr.responseText);
+                        colaboradores = data.colaboradores;
+                        initializeTable();
+                    }
+                };
+                xhr.send();
+            }
+        
+            // Função para inicializar a tabela e a paginação
+            function initializeTable() {
+                calculateTotalPages(colaboradores);
+                createPaginationControls();
+                showPage(currentPage, colaboradores);
+            }
+        
+            // Chama a função para buscar resultados dos colaboradores
+            fetchResultados();
+        
+            // Função para filtrar os colaboradores com base nas opções selecionadas pelo usuário
+            function filtrarColaboradores() {
+            var empresaSelecionada = document.getElementById("empresa").value.trim();
+            var regionalSelecionada = document.getElementById("Regional").value.trim();
+            var unidadeSelecionada = document.getElementById("unidade").value.trim();
+            var cargoSelecionado = document.getElementById("Cargo").value.trim();
+            var situacaoSelecionada = document.getElementById("situação").value.trim();
+            var nomeDigitado = document.getElementById("inputNome").value.trim().toUpperCase();
+            var matriculaDigitada = document.getElementById("inputMatricula").value.trim().toUpperCase();
+            var cpfDigitado = document.getElementById("inputCPF").value.trim().toUpperCase();
+            var admissaoDigitada = document.getElementById("admissao").value; // Valor da data de admissão
+            var desligamentoDigitado = document.getElementById("desligamento").value; // Valor da data de desligamento
+
+            var colaboradoresFiltrados = colaboradores.filter(function (colaborador) {
+            return (empresaSelecionada === "" || colaborador.empresa === empresaSelecionada) &&
+            (regionalSelecionada === "" || colaborador.regional === regionalSelecionada) &&
+            (unidadeSelecionada === "" || colaborador.unidade === unidadeSelecionada) &&
+            (cargoSelecionado === "" || colaborador.cargo === cargoSelecionado) &&
+            (situacaoSelecionada === "" || colaborador.situacao === situacaoSelecionada) &&
+            (nomeDigitado === "" || colaborador.nome.toUpperCase().includes(nomeDigitado)) &&
+            (matriculaDigitada === "" || colaborador.matricula.toUpperCase().includes(matriculaDigitada)) &&
+            (cpfDigitado === "" || colaborador.cpf.toUpperCase().includes(cpfDigitado)) &&
+            (admissaoDigitada === "" || colaborador.admissao === admissaoDigitada) && // Filtra por data de admissão
+            (desligamentoDigitado === "" || colaborador.desligamento === desligamentoDigitado); // Filtra por data de desligamento
+    });
+
+    return colaboradoresFiltrados;
+}
+        
+           // Event listeners para os elementos do formulário
+document.getElementById("empresa").addEventListener("change", function() {
+    currentPage = 1; // Reseta a página atual para a primeira ao mudar o filtro
+    atualizarTabela();
+});
+document.getElementById("Regional").addEventListener("change", function() {
+    currentPage = 1; // Reseta a página atual para a primeira ao mudar o filtro
+    atualizarTabela();
+});
+document.getElementById("unidade").addEventListener("change", function() {
+    currentPage = 1; // Reseta a página atual para a primeira ao mudar o filtro
+    atualizarTabela();
+});
+document.getElementById("Cargo").addEventListener("change", function() {
+    currentPage = 1; // Reseta a página atual para a primeira ao mudar o filtro
+    atualizarTabela();
+});
+document.getElementById("situação").addEventListener("change", function() {
+    currentPage = 1; // Reseta a página atual para a primeira ao mudar o filtro
+    atualizarTabela();
+});
+document.getElementById("inputNome").addEventListener("input", function() {
+    currentPage = 1; // Reseta a página atual para a primeira ao mudar o filtro
+    atualizarTabela();
+});
+document.getElementById("inputMatricula").addEventListener("input", function() {
+    currentPage = 1; // Reseta a página atual para a primeira ao mudar o filtro
+    atualizarTabela();
+});
+document.getElementById("inputCPF").addEventListener("input", function() {
+    currentPage = 1; // Reseta a página atual para a primeira ao mudar o filtro
+    atualizarTabela();
+});
+document.getElementById("admissao").addEventListener("change", function() {
+    currentPage = 1; // Reseta a página atual para a primeira ao mudar o filtro
+    atualizarTabela();
+});
+document.getElementById("desligamento").addEventListener("change", function() {
+    currentPage = 1; // Reseta a página atual para a primeira ao mudar o filtro
+    atualizarTabela();
+});
+
+        
+            // Função para atualizar a tabela com os colaboradores filtrados
+            function atualizarTabela() {
+            var colaboradoresFiltrados = filtrarColaboradores();
+            calculateTotalPages(colaboradoresFiltrados);
+            createPaginationControls();
+            showPage(currentPage, colaboradoresFiltrados);
+}
+        });
+        function openSidebar() {
+          document.getElementById("sidebar").classList.add("open");
+        }
+        
+        function closeSidebar() {
+          document.getElementById("sidebar").classList.remove("open");
+        }
+        
+       // Função para adicionar funcionalidade de pesquisa dentro da tabela
+  function adicionarPesquisaNaTabela() {
+    var searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("input", function() {
+      var termoPesquisa = searchInput.value.trim().toUpperCase();
+      var linhasTabela = document.querySelectorAll("#tabela-resultados tbody tr");
+      linhasTabela.forEach(function(linha) {
+        var nomeColaborador = linha.querySelector("td:nth-child(4)").textContent.toUpperCase();
+        if (nomeColaborador.includes(termoPesquisa)) {
+          linha.style.display = ""; // Exibir a linha se o nome corresponder ao termo de pesquisa
+        } else {
+          linha.style.display = "none"; // Ocultar a linha se o nome não corresponder ao termo de pesquisa
+        }
+      });
+    });
+  }
+
+  // Função para atualizar a quantidade de linhas por página
+  function changeRowsPerPage() {
+    var selectElement = document.getElementById("rowsPerPage");
+    var rowsPerPage = parseInt(selectElement.value);
+    // Atualizar a exibição da quantidade de linhas da primeira página
+    var linhasPrimeiraPagina = document.querySelectorAll("#tabela-resultados tbody tr");
+    for (var i = 0; i < linhasPrimeiraPagina.length; i++) {
+      if (i < rowsPerPage) {
+        linhasPrimeiraPagina[i].style.display = ""; // Exibir as linhas da primeira página
+      } else {
+        linhasPrimeiraPagina[i].style.display = "none"; // Ocultar as linhas que excedem a quantidade selecionada
+      }
+    }
+  }
+
+  // Chamar a função para adicionar funcionalidade de pesquisa dentro da tabela
+  adicionarPesquisaNaTabela();
+// Função para capturar informações da tabela
+function captureTableData() {
+    var table = document.getElementById("tabela-resultados");
+    var data = [];
+
+    // Percorrer as linhas da tabela, começando pela segunda linha (índice 1)
+    for (var i = 1; i < table.rows.length; i++) {
+        var row = table.rows[i];
+        var rowData = [];
+
+        // Percorrer as células de cada linha
+        for (var j = 0; j < row.cells.length; j++) {
+            var cell = row.cells[j];
+            // Adicionar o texto da célula ao array de dados da linha
+            rowData.push(cell.textContent.trim());
+        }
+
+        // Adicionar os dados da linha ao array de dados
+        data.push(rowData);
+    }
+
+    return data;
+}
+
+// Função para exportar os dados para CSV
+function exportToCSV(data) {
+    const csvContent = "data:text/csv;charset=utf-8," +
+        data.map(row => row.join(",")).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "dados.csv");
+    document.body.appendChild(link);
+    link.click();
+}
+
+// Função para exportar os dados para PDF
+function exportToPDF(data) {
+    // Implemente a lógica para exportar para PDF usando uma biblioteca adequada
+    // Por exemplo, você pode usar jsPDF ou outra biblioteca de PDF
+    // Aqui está um exemplo simplificado usando jsPDF:
+    const doc = new jsPDF();
+    data.forEach((row, rowIndex) => {
+        row.forEach((cell, cellIndex) => {
+            doc.text(cell, 10 + cellIndex * 50, 10 + rowIndex * 10);
+        });
+    });
+    doc.save("dados.pdf");
+}
+
+// Função para exportar os dados para XLSX
+function exportToXLSX(data) {
+    // Implementação para exportar para XLSX usando xlsx-populate
+    const XlsxPopulate = require('xlsx-populate');
+
+    XlsxPopulate.fromBlankAsync()
+        .then(workbook => {
+            const sheet = workbook.sheet("Sheet1");
+            data.forEach((row, rowIndex) => {
+                row.forEach((cell, cellIndex) => {
+                    sheet.cell(rowIndex + 1, cellIndex + 1).value(cell);
+                });
+            });
+            return workbook.toFileAsync("dados.xlsx");
+        })
+        .then(() => {
+            console.log("Dados exportados para XLSX com sucesso!");
+        })
+        .catch(error => {
+            console.error("Erro ao exportar dados para XLSX:", error);
+        });
+}
+
+// Função para autenticar o download e determinar o tipo de exportação
+function authenticateDownload() {
+    const exportFormat = document.getElementById("exportFormat").value;
+    const tabela = document.getElementById("tabela-resultados");
+    const data = [];
+    // Iterar sobre as linhas da tabela
+    for (let i = 0; i < tabela.rows.length; i++) {
+        const row = [];
+        // Iterar sobre as células de cada linha
+        for (let j = 0; j < tabela.rows[i].cells.length; j++) {
+            row.push(tabela.rows[i].cells[j].innerText);
+        }
+        data.push(row);
+    }
+
+    // Determinar o tipo de exportação e chamar a função correspondente
+    if (exportFormat === "csv") {
+        exportToCSV(data);
+    } else if (exportFormat === "pdf") {
+        exportToPDF(data);
+    } else if (exportFormat === "xlsx") {
+        exportToXLSX(data);
+    }
+}
+
+
+        </script>
+        
+        
+
+
+
+
+<script>
+
+  // Variável global para armazenar as datas de admissão e desligamento disponíveis
+  var datasAdmissao = [];
+  var datasDesligamento = [];
+  
+  // Função para carregar as datas de admissão e desligamento
+  function carregarDatas() {
+      fetch('{% url "carregar_colaborador" %}')
+          .then(response => response.json())
+          .then(data => {
+              // Armazena as datas de admissão e desligamento disponíveis nas variáveis globais
+              datasAdmissao = data.map(item => item.admissao);
+              datasDesligamento = data.map(item => item.desligamento);
+          })
+          .catch(error => console.error('Erro ao carregar as datas:', error));
+  }
+  
+  // Carregar as datas quando a página for carregada
+  document.addEventListener('DOMContentLoaded', function() {
+      carregarDatas();
+  });
+  
+  // Adicionar eventos change para os campos de admissão e desligamento
+  document.getElementById("admissao").addEventListener("change", validarAdmissao);
+  document.getElementById("desligamento").addEventListener("change", validarDesligamento);
+  </script>
+
+
+<script>
+
+
+
+
+// Variável para contar o número de chamadas de carregamento
+var numChamadas = 0;
+
+// Mostrar o indicador de carregamento
+document.getElementById("loader").style.display = "block";
+
+function carregarColaboradores() {
+    // Incrementar o número de chamadas
+    numChamadas++;
+
+    // Aqui você carrega os colaboradores
+    fetch('{% url "carregar_colaborador" %}')
+        .then(response => response.json())
+        .then(data => {
+            // Dados carregados com sucesso
+
+            // Decrementar o número de chamadas
+            numChamadas--;
+
+            // Verificar se todas as chamadas foram concluídas
+            if (numChamadas === 0) {
+                // Todas as chamadas foram concluídas
+                // Ocultar o indicador de carregamento
+                document.getElementById("loader").style.display = "none";
+
+                // Agora você pode manipular seus dados aqui
+            }
+        })
+        .catch(error => {
+            // Ocorreu um erro ao carregar os dados
+
+            // Decrementar o número de chamadas
+            numChamadas--;
+
+            console.error('Erro ao carregar os dados:', error);
+
+            // Verificar se todas as chamadas foram concluídas
+            if (numChamadas === 0) {
+                // Todas as chamadas foram concluídas
+                // Ocultar o indicador de carregamento
+                document.getElementById("loader").style.display = "none";
+            }
+        });
+}
+
+// Chamar a função para carregar os colaboradores
+carregarColaboradores();
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.3/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx-populate/3.14.0/xlsx-populate.min.js"></script>
+
+{% endblock %}
