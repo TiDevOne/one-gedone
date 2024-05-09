@@ -5,9 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6345d9b8-aba7-43b7-a3fd-f49d12908c09" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/documento/codigos removidos.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/documento/constants.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/documento/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/documento/asgi.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/documento/settings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/documento/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/documento/wsgi.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/documento/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/documento/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/documento/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/queries.py" beforeDir="false" afterPath="$PROJECT_DIR$/documento/queries.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/documento/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/templates/documento/configuracao.html" beforeDir="false" afterPath="$PROJECT_DIR$/documento/templates/documento/configuracao.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/templates/documento/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/documento/templates/documento/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/templates/documento/import_xlsx.html" beforeDir="false" afterPath="$PROJECT_DIR$/documento/templates/documento/import_xlsx.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/templates/documento/relatorios.html" beforeDir="false" afterPath="$PROJECT_DIR$/documento/templates/documento/relatorios.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/documento/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documento/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/documento/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gedone/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/gedone/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/bootstrap/css/relatorios.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/bootstrap/css/relatorios.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,10 +53,13 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/IMAGEONEDEV/deploy-rihappy.git&quot;,
+    &quot;url&quot;: &quot;https://github.com/IMAGEONEDEV/deploy-gedonerihappy.git&quot;,
     &quot;accountId&quot;: &quot;6a47fe81-96c6-4f49-8765-0430878a207d&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -52,7 +74,7 @@
     &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;app.teamhub.github.com/IMAGEONEDEV/gedone_rihappy-options&quot;: &quot;{\&quot;modifiedIn\&quot;:\&quot;Last3Months\&quot;,\&quot;forks\&quot;:true}&quot;,
-    &quot;app.teamhub.selectedTeam&quot;: &quot;github.com/IMAGEONEDEV/gedone_rihappy&quot;,
+    &quot;app.teamhub.selectedTeam&quot;: &quot;github.com/IMAGEONEDEV/deploy-gedonerihappy&quot;,
     &quot;app.teamhub.trackedBranches&quot;: &quot;-1brp02h/main&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
@@ -122,21 +144,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/documento/views.py</url>
-          <line>1860</line>
-          <option name="timeStamp" value="16" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/documento/models.py</url>
-          <line>311</line>
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

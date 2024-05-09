@@ -1,41 +1,39 @@
-from django.urls import include, path
+from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib.auth.views import PasswordResetDoneView, LogoutView
+from django.contrib.auth.views import PasswordResetDoneView
 from .views import (LoginView, visualizar_documentos, TotalColaboradoresView, get_documentos_info,
                     AtualizarDocumentosPendentesView, DocumentosExistentesAtivosView,
                     ObrigatoriosPorUnidadeAtivo, ObrigatoriosPorUnidadeInativo, AtualizarASOView,
                     ASOPercentualAtivoView, AtualizarCartaoPontoView, DocumentosPontoAtivoView,
-                    DocumentosPontoInativoView, CarregarDocumentosAuditoriaView,
+                    DocumentosPontoInativoView, domingos_feriados_existente,
                     CarregarRelatorioPendenteView, CarregarRelatorioExistenteView, CarregarRelatorioPendenteASOView,
                     ListarCartaoPontoInexistenteView, CarregarDocumentosVencidosView, ObrigatoriosUnidadesInativoView,
                     ASOPercentualInativoView, DocumentosObrigatoriosAtivosView, DocumentosObrigatoriosInativosView,
-                    ObrigatoriosUnidadesAtivoView, listar_documentos_vencidos, listar_documentos_a_vencer,
+                    ObrigatoriosUnidadesAtivoView, ListarDocumentosVencidosView, ListarDocumentosaVencerView,
                     get_hyperlinkpdf_data, DocumentosPendentesAtivosPorUnidadeView,
                     DocumentosPendentesInativosPorUnidadeView, DocumentoExistenteListView, buscar_pendencias)
 from .views import (
-    dashboard, index, importar_usuarios,
+    dashboard, index, importar_usuarios, gerenciar_colaborador, gerenciar_empresa, gerenciar_regional, gerenciar_unidade, gerenciar_usuario,
     CarregarDadosView, PesquisaDossieView, ListarResultadoDossieView, CarregarEmpresaView, CarregarCargoView,
     CarregarRegionalView, CarregarUnidadesView, CarregarSituacoesView, CarregarColaboradorView, dados_pessoais,
     cadastrar_area, cadastrar_grupo_documento, dossie, inserir_tipodocumento_cargo,
     relatorios, configuracao, tela_login, inserir_tipodocumento_colaborador, RelatorioPendenteView,
-    DocumentosExistentesView, DocumentoVencidoListView, DocumentoAVencerListView, ControlePontoListView,
-    PendenteASOListView, DocumentoExistenteAuditoriaListView, RelatorioGerencialListView, criar_funcionario,
+    DocumentosExistentesView, DocumentoVencidoListView, DocumentoAVencerListView,
+    PendenteASOListView, RelatorioGerencialListView, criar_funcionario,
     lista_funcionarios, cadastrar_tipodocumento, AuthenticationViews, ImportarDadosView, CustomLogoutView)
-
-
-
 
 
 
 urlpatterns = [
     # Urls tela inicial e Login
     path('index/', index, name='index'),
-    path('login/', LoginView.as_view(), name='login'),
+    path('login_login/', LoginView.as_view(), name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     # path('logar/', CustomLogoutView.as_view(), name='logar'),
     path('forgot_password/', AuthenticationViews.as_view, name='forgot_password'),
     path('password_reset_done/', PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('documento/importar_dados/', ImportarDadosView.as_view(), name='importar-dados'),
 
 
     # Urls tela DOSSIE
@@ -82,9 +80,9 @@ urlpatterns = [
 
 
     path('documentos_vencidos/', CarregarDocumentosVencidosView.as_view(), name='documentos_vencidos'),
-    path('lista_documentos_vencidos/', listar_documentos_vencidos, name='lista_vencidos'),
-    path('lista_a_vence/', listar_documentos_a_vencer, name='lista_a_vencer'),
-    path('documentos_auditoria/', CarregarDocumentosAuditoriaView.as_view(), name='documentos_auditorias'),
+    path('lista_documentos_vencidos/', ListarDocumentosVencidosView.as_view(), name='lista_vencidos'),
+    path('lista_a_vence/', ListarDocumentosaVencerView.as_view(), name='lista_a_vencer'),
+    # path('documentos_auditoria/', CarregarDocumentosAuditoriaView.as_view(), name='documentos_auditorias'),
     path('documentos_existentes/', DocumentosExistentesView.as_view(), name='documentos_existentes'),
     path('atualizar-documentos-pendentes/', AtualizarDocumentosPendentesView.as_view(), name='atualizar_documentos_pendentes'),
     path('pendente_aso/', AtualizarASOView.as_view(), name='atualizar-aso'),
@@ -104,20 +102,20 @@ urlpatterns = [
     path('documentos_existentes/', DocumentoExistenteListView.as_view(), name='documentos_existentes'),
     path("documentos_vencidos/", DocumentoVencidoListView.as_view(), name="documentos_vencidos"),
     path("documentos_a_vencer/", DocumentoAVencerListView.as_view(), name="documentos_a_vencer"),
-    path("controle_ponto/", ControlePontoListView.as_view(), name="controle_ponto"),
+    # path("controle_ponto/", ControlePontoListView.as_view(), name="controle_ponto"),
     path("pendentes_aso/", PendenteASOListView.as_view(), name="pendentes_aso"),
-    path("documentos_existentes_auditoria/", DocumentoExistenteAuditoriaListView.as_view(),
-         name="documentos_existentes_auditoria"),
+    # path("documentos_existentes_auditoria/", DocumentoExistenteAuditoriaListView.as_view(), name="documentos_existentes_auditoria"),
     path("relatorios_gerenciais/", RelatorioGerencialListView.as_view(), name="relatorios_gerenciais"),
     path('total_colaboradores/', TotalColaboradoresView.as_view(), name='total_colaboradores'),
     path('obrigatorios-inativos-unidade/', ObrigatoriosPorUnidadeInativo.as_view(), name='obrigatorios_inativos_unid'),
 
+    path('pesquisa-documentos/', domingos_feriados_existente, name='domingos_feriados'),
 
     path('pendencias/', buscar_pendencias, name='buscar_pendencias'),
 
 
     # Urls Tela Configurações
-    path('importar_dados/', ImportarDadosView.as_view, name='importar_dados'),
+    path('importar_dados/', ImportarDadosView.as_view(), name='importar_dados'),
     path('importar-usuarios/', importar_usuarios, name='importar_usuarios'),
     path('criar-funcionario/', criar_funcionario, name='criar_funcionario'),
     path('lista-funcionarios/', lista_funcionarios, name='lista_funcionarios'),
@@ -127,7 +125,11 @@ urlpatterns = [
     path('cadastrar_tipodocumento/', cadastrar_tipodocumento, name='cadastrar_tipodocumento'),
     path('inserir_tipodocumento_cargo/', inserir_tipodocumento_cargo, name='inserir_tipodocumento_cargo'),
     path('inserir_tipodocumento_colaborador/', inserir_tipodocumento_colaborador, name='inserir_tipodocumento_colaborador'),
-
+    path('cadastro_colaborador/', gerenciar_colaborador, name='cadastrar_colaboradores'),
+    path('cadastro_empresa/', gerenciar_empresa, name='cadastrar_empresas'),
+    path('cadastro_regional/', gerenciar_regional, name='cadastrar_regionais'),
+    path('cadastro_uniade/', gerenciar_unidade, name='cadsatrar_unidades'),
+    path('cadastro_usuario/', gerenciar_usuario, name='cadastro_usuarios'),
 
     path('dossie/', dossie, name='dossie'),
     path('relatorios/', relatorios, name='relatorios'),

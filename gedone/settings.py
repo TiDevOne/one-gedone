@@ -9,10 +9,40 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+import sys
 from pathlib import Path
 import os
+from loguru import logger
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'django.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'documento': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
+# Configure Loguru to use Django's logging configuration
+logger.configure(handlers=[{"sink": sys.stdout, "level": "DEBUG"}])
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -53,28 +83,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
-ROOT_URLCONF = 'gedone.urls'
 
-"""TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-            os.path.join(BASE_DIR, 'templates/documento'),
-        ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]"""
+ROOT_URLCONF = 'gedone.urls'
 
 TEMPLATES = [
     {
@@ -94,7 +107,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'gedone.wsgi.application'
-LOGIN_URL = 'index/'  # Ou outra URL de sua escolha
+LOGIN_URL = 'index/'  # Ou outra URL da sua escolha
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -118,10 +131,10 @@ DATABASES = {
     }
 }
 
-"""  
 
-REMOVER O COMENTÁRIO ANTES DE SUBIR O CODIGO PARA PRODUÇÃO
 
+# REMOVER O COMENTÁRIO ANTES DE SUBIR O CODIGO PARA PRODUÇÃO
+"""
 # Configurações de segurança
 DEBUG = False
 SECURE_BROWSER_XSS_FILTER = True

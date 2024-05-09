@@ -204,10 +204,37 @@ nav.menu-lateral {
 
 
 .form-row {
-    display: flex;
-    margin-bottom: 16px;
-   }
+  position: relative;
+  margin-bottom: 20px;
+}
 
+.form-row select,
+.form-row input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.3s ease;
+}
+
+.form-row label {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
+  pointer-events: none;
+}
+
+.form-row select:focus + label,
+.form-row input:focus + label,
+.form-row select:valid + label,
+.form-row input:valid + label {
+  top: 5px;
+  font-size: 12px;
+  color: #723588;
+}
 
   .date-row {
     width: 100%;
@@ -336,6 +363,48 @@ body.sem-imagem-fundo {
   width: 75%; /* Largura do sidebar quando estiver ativo */
 }
 
+.sidebar2 {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Cor meio preto transparente */
+  width: 0;
+  transition: width 0.5s ease; /* Transição suave da largura */
+  overflow-x: hidden; /* Para esconder o conteúdo horizontalmente */
+  overflow-y: auto; /* Adiciona barra de rolagem vertical quando necessário */
+  display: flex; /* Para centralizar o conteúdo verticalmente */
+  align-items: center; /* Centraliza verticalmente */
+  justify-content: right; /* Centraliza horizontalmente */
+  z-index: 1;
+}
+
+.sidebar2.active {
+  width: 75%; /* Largura do sidebar quando estiver ativo */
+}
+
+
+.sidebar3 {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Cor meio preto transparente */
+  width: 0;
+  transition: width 0.5s ease; /* Transição suave da largura */
+  overflow-x: hidden; /* Para esconder o conteúdo horizontalmente */
+  overflow-y: auto; /* Adiciona barra de rolagem vertical quando necessário */
+  display: flex; /* Para centralizar o conteúdo verticalmente */
+  align-items: center; /* Centraliza verticalmente */
+  justify-content: right; /* Centraliza horizontalmente */
+  z-index: 1;
+}
+
+.sidebar3.active {
+  width: 75%; /* Largura do sidebar quando estiver ativo */
+}
+
+
 .table-container {
   background-color: white;
   max-width: 90%;;
@@ -368,6 +437,69 @@ body.sem-imagem-fundo {
 }
 
 #tabela-relatorio tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* Define a cor de fundo para as linhas ímpares */
+}
+
+
+
+
+
+#tabela-relatorio2 {
+  width: 100%;
+}
+
+#tabela-relatorio2 th,
+#tabela-relatorio2 td {
+  padding: 8px;
+  text-align: left;
+}
+
+.close-btn2 {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+/* Estilo para as linhas alternadas da tabela */
+#tabela-relatorio2 tbody tr:nth-child(even) {
+  background-color: #f2f2f2; /* Define a cor de fundo para as linhas pares */
+}
+
+#tabela-relatorio2 tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* Define a cor de fundo para as linhas ímpares */
+}
+
+
+
+
+#tabela-relatorio3 {
+  width: 100%;
+}
+
+#tabela-relatorio3 th,
+#tabela-relatorio3 td {
+  padding: 8px;
+  text-align: left;
+}
+
+.close-btn3 {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+/* Estilo para as linhas alternadas da tabela */
+#tabela-relatorio3 tbody tr:nth-child(even) {
+  background-color: #f2f2f2; /* Define a cor de fundo para as linhas pares */
+}
+
+#tabela-relatorio3 tbody tr:nth-child(odd) {
   background-color: #ffffff; /* Define a cor de fundo para as linhas ímpares */
 }
 
@@ -429,4 +561,42 @@ button i.bi-download {
 .pagination button:hover {
   /* Estilos quando o mouse passa por cima dos botões */
   background-color: #723588; /* Cor de fundo */
+}
+
+
+
+.checkbox-container {
+  display: flex;
+  justify-content: center;
+}
+
+.checkbox-label {
+  margin: 0 25px; /* Adicionando espaçamento horizontal entre os checkboxes */
+}
+
+.checkbox-label input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-label .checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #723588;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: #723588;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: block;
 }

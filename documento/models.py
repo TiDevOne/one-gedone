@@ -1,3 +1,4 @@
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
@@ -16,6 +17,9 @@ PCD = (
     ("NÂO", "não"),
     ("NAO", "nao")
 )
+
+
+# **************** BASE GERAL DO SISTEMA **********************
 
 class Empresa(models.Model):
     """
@@ -163,61 +167,6 @@ class Colaborador(models.Model):
         return self.nome
 
 
-class ResultadoDossie(models.Model):
-    """
-    Modelo para representar os dados da imagem do dossiê do colaborador.
-
-    Atributos:
-        nome (CharField): Nome do colaborador.
-        matricula (CharField): Matrícula do colaborador.
-        cargo (CharField): Cargo do colaborador.
-        data_admissao (DateField): Data de admissão do colaborador.
-        data_demissao (DateField): Data de demissão do colaborador.
-        endereco (CharField): Endereço do colaborador.
-        telefone (CharField): Telefone do colaborador.
-        estado_civil (CharField): Estado civil do colaborador.
-        naturalidade (CharField): Naturalidade do colaborador.
-        data_nascimento (DateField): Data de nascimento do colaborador.
-        rg (CharField): RG do colaborador.
-        cpf (CharField): CPF do colaborador.
-        banco (CharField): Banco do colaborador.
-        agencia (CharField): Agência do colaborador.
-        conta_corrente (CharField): Conta corrente do colaborador.
-        data_contratacao (DateField): Data de Contratação do colaborador.
-        salario (DecimalField): Salário do colaborador.
-        jornada_trabalho (CharField): Jornada de Trabalho do colaborador.
-        funcao (CharField): Função do colaborador.
-        departamento (CharField): Departamento do colaborador.
-        nivel_escolaridade (CharField): Nível de Escolaridade do colaborador.
-        instituicao (CharField): Instituição do colaborador.
-        curso (CharField): Curso do colaborador.
-        ano_conclusao (DateField): Ano de Conclusao do colaborador.
-        empresa (CharField): Empresa do colaborador.
-        cargo_experiencia (CharField): Cargo do colaborador.
-        periodo_experiencia (CharField): Período de experiência do colaborador.
-        descricao_atividades (TextField): Descrição das atividades do colaborador.
-    """
-
-    nome = models.CharField(
-        max_length=255,
-        verbose_name="Nome",
-    )
-    matricula = models.CharField(
-        max_length=20,
-        verbose_name="Matrícula",
-    )
-    cargo = models.CharField(
-        max_length=255,
-        verbose_name="Cargo",
-    )
-    data_admissao = models.DateField(
-        verbose_name="Data de Admissão",
-    )
-    data_demissao = models.DateField(
-        verbose_name="Data de Demissão",
-    )
-
-
 class Area(models.Model):
     nome = models.CharField(max_length=255)
     codigo = models.CharField(max_length=255)
@@ -235,6 +184,10 @@ class Area(models.Model):
         if primeira_area:
             return primeira_area.id
         return None
+
+
+
+#   ************** CONFIGURAÇÔES *****************
 
 
 class GrupoDocumento(models.Model):
@@ -380,230 +333,6 @@ class Hyperlinkpdf(models.Model):
         return self.nome_arquivo
 
 
-class DocumentoPendente(models.Model):
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
-    regional = models.ForeignKey(Regional, on_delete=models.CASCADE)
-    unidade = models.ForeignKey(Unidade, on_delete=models.CASCADE)
-    nome = models.ForeignKey(Colaborador, on_delete=models.CASCADE)
-    matricula = models.CharField(max_length=20)
-    cpf = models.CharField(max_length=14)
-    cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE)
-    admissao = models.DateField()
-    desligamento = models.DateField(null=True, blank=True)
-    situacao = models.CharField(max_length=255, null=True, blank=True)
-    tipo_documento = models.ForeignKey(TipoDocumento, on_delete=models.CASCADE)
-    obrigatorio = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'relatoriodocpendente'
-
-    def __str__(self):
-        return f"{self.nome} - {self.tipo_documento}"
-
-
-class DocumentoExistente(models.Model):
-    """
-    Modelo para representar um documento existente.
-
-    Atributos:
-        unit (CharField): Unidade do documento.
-        name (CharField): Nome do colaborador associado ao documento.
-        matricula (CharField): Matrícula do colaborador associado ao documento.
-        cpf (CharField): CPF do colaborador associado ao documento.
-        job_title (CharField): Cargo do colaborador associado ao documento.
-        initial_admission_date (DateField): Data de admissão inicial do colaborador.
-        initial_termination_date (DateField): Data de desligamento inicial do colaborador.
-        status (CharField): Situação do documento.
-        doc_type (CharField): Tipo de documento.
-        final_admission_date (DateField): Data de admissão final do colaborador.
-        final_termination_date (DateField): Data de desligamento final do colaborador.
-    """
-
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, default=Empresa.get_default_empresa_id)
-    regional = models.ForeignKey(Regional, on_delete=models.CASCADE, default=Regional.get_default_regional_id)
-    unidade = models.ForeignKey(Unidade, on_delete=models.CASCADE, default=Unidade.get_default_unidade_id)
-    nome = models.CharField(max_length=255)
-    matricula = models.CharField(max_length=20)
-    cpf = models.CharField(max_length=14)
-    cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE, default=Cargo.get_default_cargo_id)
-    admissao = models.DateField()
-    desligamento = models.DateField(null=True, blank=True)
-    status = models.ForeignKey(Situacao, on_delete=models.CASCADE)
-    tipo_documento = models.CharField(max_length=255)
-
-    def str(self):
-        return self.nome_colaborador
-
-class PendenteASO(models.Model):
-    """
-    Modelo para armazenar informações sobre as pendências ASO.
-
-    Atributos:
-        id (AutoField): Chave primária do modelo.
-        empresa (ForeignKey): Referência à empresa do colaborador.
-        regional (ForeignKey): Referência à regional do colaborador.
-        unidade (ForeignKey): Referência à unidade do colaborador.
-        nome (ForeignKey): Referência ao nome do colaborador.
-        matricula (CharField): Matrícula do colaborador.
-        cpf (CharField): CPF do colaborador, opcional.
-        cargo (ForeignKey): Referência ao cargo do colaborador.
-        admissao (DateField): Data de admissão do colaborador.
-        desligamento (DateField): Data de desligamento do colaborador, opcional.
-        status (ForeignKey): Status atual do colaborador.
-        tipo_aso (ForeignKey): Tipo de ASO relacionado à pendência.
-        aso_admissional_existente (BooleanField): Indica se o ASO Admissional está presente.
-        aso_demissional_existente (BooleanField): Indica se o ASO Demissional está presente.
-        aso_periodico_existente (BooleanField): Indica se o ASO Periódico/Retorno ao Trabalho está presente.
-    """
-
-    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True)
-    regional = models.ForeignKey('Regional', on_delete=models.CASCADE, null=True)
-    unidade = models.ForeignKey('Unidade', on_delete=models.CASCADE, null=True)
-    nome = models.ForeignKey('Colaborador', on_delete=models.CASCADE, null=True)
-    matricula = models.CharField(max_length=20)
-    cpf = models.CharField(max_length=14, null=True)
-    cargo = models.ForeignKey('Cargo', on_delete=models.CASCADE, null=True)
-    admissao = models.DateField(null=True)
-    desligamento = models.DateField(null=True, blank=True)
-    status = models.ForeignKey('Situacao', on_delete=models.CASCADE, null=True)
-    tipo_aso = models.ForeignKey('TipoDocumento', on_delete=models.CASCADE, null=True)
-    aso_admissional_existente = models.BooleanField(default=False)
-    aso_demissional_existente = models.BooleanField(default=False)
-    aso_periodico_existente = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Pendente ASO - {self.tipo_aso.nome} - {self.nome}"
-
-
-class CartaoPontoInexistente(models.Model):
-    """
-    Modelo para armazenar informações sobre os cartões de ponto inexistentes.
-    """
-
-    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True)
-    regional = models.ForeignKey('Regional', on_delete=models.CASCADE, null=True)
-    unidade = models.ForeignKey('Unidade', on_delete=models.CASCADE, null=True)
-    colaborador = models.ForeignKey('Colaborador', on_delete=models.CASCADE, null=True)  # Renomeado de "nome" para "colaborador"
-    data = models.DateField(null=True, blank=True)
-    existente = models.BooleanField(default=False)
-    status = models.ForeignKey('Situacao', on_delete=models.CASCADE, null=True)
-
-    def __str__(self):
-        return f"Cartão de Ponto Inexistente - {self.data} - {self.colaborador.nome}"
-
-class DocumentoVencido(models.Model):
-    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True)
-    regional = models.ForeignKey('Regional', on_delete=models.CASCADE, null=True)
-    unidade = models.ForeignKey('Unidade', on_delete=models.CASCADE, null=True)
-    colaborador = models.ForeignKey('Colaborador', on_delete=models.CASCADE, null=True)
-    matricula = models.CharField(max_length=255)
-    cpf = models.CharField(max_length=255)
-    cargo = models.ForeignKey('Cargo', on_delete=models.CASCADE, null=True)
-    dta_documento = models.DateField(null=True)
-    tipo_documento = models.ForeignKey('TipoDocumento', on_delete=models.CASCADE, null=True)
-    precisa_renovar = models.BooleanField(default=False)
-    # status = models.ForeignKey('Situacao', on_delete=models.CASCADE, null=True)
-
-    @classmethod
-    def criar_a_partir_de_hyperlinkpdf(cls, hyperlinkpdf):
-        tipo_doc_id = str(hyperlinkpdf.documento.codigo_documento)
-        precisa_renovar = tipo_doc_id in ['403', '501', '502']
-        return cls(
-            empresa=hyperlinkpdf.empresa,
-            regional=hyperlinkpdf.regional,
-            unidade=hyperlinkpdf.unidade,
-            colaborador=hyperlinkpdf.colaborador,
-            matricula=hyperlinkpdf.matricula,
-            cpf=hyperlinkpdf.cpf,
-            cargo=hyperlinkpdf.cargo,
-            dta_documento=hyperlinkpdf.dta_documento,
-            tipo_documento=hyperlinkpdf.documento,
-            precisa_renovar=precisa_renovar
-        )
-
-    def __str__(self):
-        return f"{self.colaborador.nome if self.colaborador else 'Desconhecido'} - {self.tipo_documento}"
-
-    class Meta:
-        db_table = 'documentos_vencidos'
-
-class DocumentoAuditoria(models.Model):
-    """
-    Modelo para armazenar informações sobre os documentos de auditoria.
-
-    Atributos:
-        id (AutoField): Chave primária do modelo.
-        numero (CharField): Número do documento.
-        data (DateField): Data do documento.
-        tipo (CharField): Tipo do documento (auditoria interna, auditoria externa, etc.).
-        titulo (CharField): Título do documento.
-        descricao (TextField): Descrição do documento.
-        arquivo (FileField): Arquivo do documento.
-    """
-
-    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True)
-    regional = models.ForeignKey('Regional', on_delete=models.CASCADE, null=True)
-    unidade = models.ForeignKey('Unidade', on_delete=models.CASCADE, null=True)
-    colaborador = models.ForeignKey('Colaborador', on_delete=models.CASCADE, null=True)
-    cargo = models.ForeignKey('Cargo', on_delete=models.CASCADE, null=True)
-    tipo_documento = models.ForeignKey('TipoDocumento', on_delete=models.CASCADE, null=True)
-    tipo_auditoria = models.CharField(max_length=255)
-    status = models.ForeignKey('Situacao', on_delete=models.CASCADE, null=True)
-    existente = models.BooleanField(default=False)
-
-    def str(self):
-        return f"Documento de Auditoria - {self.numero} - {self.titulo}"
-
-class DocumentoExistenteAuditoria(models.Model):
-    """
-    Modelo para armazenar informações sobre os documentos existentes de auditorias.
-
-    Atributos:
-        id (AutoField): Chave primária do modelo.
-        numero (CharField): Número do documento.
-        data (DateField): Data do documento.
-        tipo (CharField): Tipo do documento (auditoria interna, auditoria externa, etc.).
-        titulo (CharField): Título do documento.
-        descricao (TextField): Descrição do documento.
-        arquivo (FileField): Arquivo do documento.
-    """
-
-    id = models.AutoField(primary_key=True)
-    numero = models.CharField(max_length=255)
-    data = models.DateField()
-    tipo = models.CharField(max_length=255)
-    titulo = models.CharField(max_length=255)
-    descricao = models.TextField()
-    arquivo = models.FileField()
-
-    def str(self):
-        return f"Documento Existente de Auditoria - {self.numero} - {self.titulo}"
-
-
-class RelatorioGerencial(models.Model):
-    """
-    Modelo para armazenar informações sobre os relatórios gerenciais.
-
-    Atributos:
-        id (AutoField): Chave primária do modelo.
-        titulo (CharField): Título do relatório.
-        descricao (TextField): Descrição do relatório.
-        data_criacao (DateField): Data de criação do relatório.
-        data_atualizacao (DateField): Data de atualização do relatório.
-        arquivo (FileField): Arquivo do relatório.
-    """
-
-    id = models.AutoField(primary_key=True)
-    titulo = models.CharField(max_length=255)
-    descricao = models.TextField()
-    data_criacao = models.DateField()
-    data_atualizacao = models.DateField()
-    arquivo = models.FileField()
-
-    def str(self):
-        return f"Relatório Gerencial - {self.titulo}"
-
-
 class ImportUsuarioXLSX(models.Model):
     nome = models.CharField(max_length=100)
     login = models.CharField(max_length=50)
@@ -614,43 +343,6 @@ class ImportUsuarioXLSX(models.Model):
 
     def str(self):
         return self.nome  # Ou outro campo que você deseja que apareça quando você imprime um objeto ImportUsuarioXLSX
-
-
-class SistemaPonto(models.Model):
-    """
-    Modelo que representa um sistema de ponto.
-    """
-
-    nome = models.CharField(max_length=255)
-
-class ControlePonto(models.Model):
-    """
-    Modelo para armazenar informações sobre o controle de ponto.
-
-    Atributos:
-        id (AutoField): Chave primária do modelo.
-        regional (CharField): Regional do colaborador.
-        unidade (CharField): Unidade do colaborador.
-        nome_colaborador (CharField): Nome do colaborador.
-        matricula (CharField): Matrícula do colaborador.
-        data (DateField): Data do ponto.
-        hora_entrada (TimeField): Hora de entrada do colaborador.
-        hora_saida (TimeField): Hora de saída do colaborador.
-        justificativa (TextField): Justificativa para atraso ou falta.
-    """
-
-    id = models.AutoField(primary_key=True)
-    regional = models.CharField(max_length=255)
-    unidade = models.CharField(max_length=255)
-    nome_colaborador = models.CharField(max_length=255)
-    matricula = models.CharField(max_length=255)
-    data = models.DateField()
-    hora_entrada = models.TimeField()
-    hora_saida = models.TimeField()
-    justificativa = models.TextField()
-
-    def str(self):
-        return f"Controle de Ponto - {self.data} - {self.nome_colaborador}"
 
 
 class UsuarioManager(BaseUserManager):
@@ -742,3 +434,179 @@ class PasswordResetRequest(models.Model):
     email = models.EmailField()
     token = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+#   ************** Relatórios *****************
+
+class DocumentoPendente(models.Model):
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+    regional = models.ForeignKey(Regional, on_delete=models.CASCADE)
+    unidade = models.ForeignKey(Unidade, on_delete=models.CASCADE)
+    nome = models.ForeignKey(Colaborador, on_delete=models.CASCADE)
+    matricula = models.CharField(max_length=20)
+    cpf = models.CharField(max_length=14)
+    cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE)
+    admissao = models.DateField()
+    desligamento = models.DateField(null=True, blank=True)
+    situacao = models.CharField(max_length=255, null=True, blank=True)
+    tipo_documento = models.ForeignKey(TipoDocumento, on_delete=models.CASCADE)
+    obrigatorio = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'relatoriodocpendente'
+
+    def __str__(self):
+        return f"{self.nome} - {self.tipo_documento}"
+
+
+class PendenteASO(models.Model):
+    """
+    Modelo para armazenar informações sobre as pendências ASO.
+
+    Atributos:
+        id (AutoField): Chave primária do modelo.
+        empresa (ForeignKey): Referência à empresa do colaborador.
+        regional (ForeignKey): Referência à regional do colaborador.
+        unidade (ForeignKey): Referência à unidade do colaborador.
+        nome (ForeignKey): Referência ao nome do colaborador.
+        matricula (CharField): Matrícula do colaborador.
+        cpf (CharField): CPF do colaborador, opcional.
+        cargo (ForeignKey): Referência ao cargo do colaborador.
+        admissao (DateField): Data de admissão do colaborador.
+        desligamento (DateField): Data de desligamento do colaborador, opcional.
+        status (ForeignKey): Status atual do colaborador.
+        tipo_aso (ForeignKey): Tipo de ASO relacionado à pendência.
+        aso_admissional_existente (BooleanField): Indica se o ASO Admissional está presente.
+        aso_demissional_existente (BooleanField): Indica se o ASO Demissional está presente.
+        aso_periodico_existente (BooleanField): Indica se o ASO Periódico/Retorno ao Trabalho está presente.
+    """
+
+    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True)
+    regional = models.ForeignKey('Regional', on_delete=models.CASCADE, null=True)
+    unidade = models.ForeignKey('Unidade', on_delete=models.CASCADE, null=True)
+    nome = models.ForeignKey('Colaborador', on_delete=models.CASCADE, null=True)
+    matricula = models.CharField(max_length=20)
+    cpf = models.CharField(max_length=14, null=True)
+    cargo = models.ForeignKey('Cargo', on_delete=models.CASCADE, null=True)
+    admissao = models.DateField(null=True)
+    desligamento = models.DateField(null=True, blank=True)
+    status = models.ForeignKey('Situacao', on_delete=models.CASCADE, null=True)
+    tipo_aso = models.ForeignKey('TipoDocumento', on_delete=models.CASCADE, null=True)
+    aso_admissional_existente = models.BooleanField(default=False)
+    aso_demissional_existente = models.BooleanField(default=False)
+    aso_periodico_existente = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Pendente ASO - {self.tipo_aso.nome} - {self.nome}"
+
+class DomingosFeriados(models.Model):
+    loja = models.CharField(max_length=255)
+    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True)
+    regional = models.ForeignKey('Regional', on_delete=models.CASCADE, null=True)
+    data_documento = models.DateField(null=True, blank=True)
+    nome_documento = models.CharField(max_length=255)
+    link_documento = models.CharField(max_length=255)
+    data_upload = models.DateField()
+
+
+    class Meta:
+        db_table = 'domingosferiados'
+
+    def __str__(self):
+        return self.nome_arquivo
+
+class CartaoPontoInexistente(models.Model):
+    """
+    Modelo para armazenar informações sobre os cartões de ponto inexistentes.
+    """
+
+    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True)
+    regional = models.ForeignKey('Regional', on_delete=models.CASCADE, null=True)
+    unidade = models.ForeignKey('Unidade', on_delete=models.CASCADE, null=True)
+    colaborador = models.ForeignKey('Colaborador', on_delete=models.CASCADE, null=True)  # Renomeado de "nome" para "colaborador"
+    data = models.DateField(null=True, blank=True)
+    existente = models.BooleanField(default=False)
+    status = models.ForeignKey('Situacao', on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"Cartão de Ponto Inexistente - {self.data} - {self.colaborador.nome}"
+
+class DocumentoVencido(models.Model):
+    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True)
+    regional = models.ForeignKey('Regional', on_delete=models.CASCADE, null=True)
+    unidade = models.ForeignKey('Unidade', on_delete=models.CASCADE, null=True)
+    colaborador = models.ForeignKey('Colaborador', on_delete=models.CASCADE, null=True)
+    matricula = models.CharField(max_length=255)
+    cpf = models.CharField(max_length=255)
+    cargo = models.ForeignKey('Cargo', on_delete=models.CASCADE, null=True)
+    dta_documento = models.DateField(null=True)
+    tipo_documento = models.ForeignKey('TipoDocumento', on_delete=models.CASCADE, null=True)
+    precisa_renovar = models.BooleanField(default=False)
+    data_vencimento = models.DateField(null=True, blank=True)  # Campo para armazenar a data de vencimento
+
+    def save(self, *args, **kwargs):
+        try:
+            if self.dta_documento and self.tipo_documento and self.tipo_documento.validade:
+                # Tentativa de converter validade para inteiro
+                validade_meses = int(self.tipo_documento.validade)
+                self.data_vencimento = self.dta_documento + relativedelta(months=validade_meses)
+        except ValueError:
+            # Trata o caso onde a conversão falha
+            print("Erro ao converter a validade para inteiro.")
+            # Você pode escolher logar o erro, enviar para um sistema de monitoramento, ou mesmo definir um valor padrão
+            self.data_vencimento = None  # Define um valor padrão ou mantém o anterior
+        except Exception as e:
+            # Trata qualquer outro tipo de erro que possa ocorrer
+            print(f"Erro desconhecido ao salvar DocumentoVencido: {str(e)}")
+            self.data_vencimento = None  # Segurança para garantir que não fiquemos com um estado inconsistente
+
+        super(DocumentoVencido, self).save(*args, **kwargs)
+
+    @classmethod
+    def criar_a_partir_de_hyperlinkpdf(cls, hyperlinkpdf):
+        tipo_doc_id = str(hyperlinkpdf.documento.codigo_documento)
+        precisa_renovar = tipo_doc_id in ['403', '501', '502']
+        return cls(
+            empresa=hyperlinkpdf.empresa,
+            regional=hyperlinkpdf.regional,
+            unidade=hyperlinkpdf.unidade,
+            colaborador=hyperlinkpdf.colaborador,
+            matricula=hyperlinkpdf.matricula,
+            cpf=hyperlinkpdf.cpf,
+            cargo=hyperlinkpdf.cargo,
+            dta_documento=hyperlinkpdf.dta_documento,
+            tipo_documento=hyperlinkpdf.documento,
+            precisa_renovar=precisa_renovar
+        )
+
+    def __str__(self):
+        return f"{self.colaborador.nome if self.colaborador else 'Desconhecido'} - {self.tipo_documento}"
+
+    class Meta:
+        db_table = 'documentos_vencidos'
+
+
+class RelatorioGerencial(models.Model):
+    """
+    Modelo para armazenar informações sobre os relatórios gerenciais.
+
+    Atributos:
+        id (AutoField): Chave primária do modelo.
+        titulo (CharField): Título do relatório.
+        descricao (TextField): Descrição do relatório.
+        data_criacao (DateField): Data de criação do relatório.
+        data_atualizacao (DateField): Data de atualização do relatório.
+        arquivo (FileField): Arquivo do relatório.
+    """
+
+    id = models.AutoField(primary_key=True)
+    titulo = models.CharField(max_length=255)
+    descricao = models.TextField()
+    data_criacao = models.DateField()
+    data_atualizacao = models.DateField()
+    arquivo = models.FileField()
+
+    def str(self):
+        return f"Relatório Gerencial - {self.titulo}"
+
+

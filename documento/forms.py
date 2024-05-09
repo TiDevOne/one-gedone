@@ -1,14 +1,9 @@
 from django import forms
 from jsonschema.exceptions import ValidationError
-from .models import Usuario, Area, TipoDocumento
+from .models import Usuario, Area, TipoDocumento, RelatorioGerencial
 from .models import DocumentoVencido
 from django.forms import ModelForm
-from .models import ControlePonto
-from .models import DocumentoExistenteAuditoria
-from .models import RelatorioGerencial
-from .models import DocumentoExistente
-from .models import Empresa, Regional, Unidade, Cargo, Situacao, SistemaPonto, \
-    GrupoDocumento
+from .models import Empresa, Regional, Unidade, Cargo, Situacao, GrupoDocumento
 from .models import Colaborador
 from django.forms import DateInput
 from django.contrib.auth.forms import UserCreationForm
@@ -144,11 +139,6 @@ class SituacaoForm(forms.ModelForm):
         fields = ['nome']
 
 
-class SistemaPontoForm(forms.ModelForm):
-    class Meta:
-        model = SistemaPonto
-        fields = ['nome']
-
 class ImportarUsuariosForm(forms.Form):
     """
     Formulário para importar usuários a partir de um arquivo.
@@ -191,33 +181,6 @@ class RelatoriosPendentesForm(forms.Form):
                                                 label='Tipo de Documento')
 
 
-class DocumentoExistenteForm(ModelForm):
-    """
-    Formulário para pesquisa de documentos existentes.
-
-    Atributos:
-        model (Model): Modelo que será usado para carregar os dados (DocumentoExistente).
-        fields (list): Lista de campos que serão exibidos no formulário.
-    """
-
-    model = DocumentoExistente
-    fields = [
-        "empresa",
-        "regional",
-        "unidade",
-        "colaborador",
-        "matricula",
-        "cpf",
-        "cargo",
-        "data_admissao_inicial",
-        "data_admissao_final",
-        "situacao",
-        "tipo_documento",
-        "numero_documento",
-        "data_documento",
-    ]
-
-
 class DocumentoVencidoForm(ModelForm):
     """
     Formulário para pesquisa de documentos vencidos.
@@ -243,50 +206,6 @@ class DocumentoVencidoForm(ModelForm):
         "tipo_documento",
     ]
 
-
-
-class ControlePontoForm(ModelForm):
-    """
-    Formulário para pesquisa de pontos.
-
-    Atributos:
-        model (Model): Modelo que será usado para carregar os dados (ControlePonto).
-        fields (list): Lista de campos que serão exibidos no formulário.
-    """
-
-    model = ControlePonto
-    fields = [
-        "empresa",
-        "regional",
-        "unidade",
-        "nome_colaborador",
-        "matricula",
-        "data",
-        "hora_entrada",
-        "hora_saida",
-        "justificativa",
-    ]
-
-
-class DocumentoExistenteAuditoriaForm(ModelForm):
-    """
-    Formulário para pesquisa de documentos existentes de auditorias.
-
-    Atributos:
-        model (Model): Modelo que será usado para carregar os dados (DocumentoExistenteAuditoria).
-        fields (list): Lista de campos que serão exibidos no formulário.
-    """
-
-    model = DocumentoExistenteAuditoria
-    fields = [
-        "numero",
-        "data",
-        "tipo",
-        "titulo",
-        "descricao",
-    ]
-
-
 class RelatorioGerencialForm(ModelForm):
     """
     Formulário para pesquisa de relatórios gerenciais.
@@ -303,6 +222,12 @@ class RelatorioGerencialForm(ModelForm):
         "data_criacao",
         "data_atualizacao",
     ]
+
+class PesquisaDomingosFeriadosForm(forms.Form):
+    empresa = forms.IntegerField(required=False)
+    regional = forms.IntegerField(required=False)  # Assumindo que regional é um ID
+    loja = forms.CharField(max_length=255, required=False)
+    data = forms.DateField(required=False)
 
 class UserPermissionForm(forms.ModelForm):
     permissions = forms.ModelMultipleChoiceField(

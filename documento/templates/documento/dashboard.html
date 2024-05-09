@@ -310,17 +310,17 @@ fetch("{% url 'obrigatorios_por_unidade' %}")
     })
     .catch(error => console.error('Erro ao carregar dados:', error));
     }
-    
+
     // Função para exibir gráfico de documentos pendentes por tipo para uma unidade específica
     function exibirGraficoDocumentos(unidade, documentos, estado) {
         documentosData = documentos; // Armazenar os dados dos documentos pendentes
-    
+
         const tiposDocumento = documentosData.map(doc => doc.tipo_documento);
         const quantidades = documentosData.map(doc => doc.quantidade);
-    
+
         // Remover gráfico de unidades
         graficoUnidades.destroy();
-    
+
         // Definir o título do gráfico com o nome da unidade e o estado dos dados
         let titulo = `${unidade} - Pendentes`;
         if (estado === 'ativos') {
@@ -328,7 +328,7 @@ fetch("{% url 'obrigatorios_por_unidade' %}")
         } else if (estado === 'inativos') {
             titulo += ' - Inativos';
         }
-    
+
         // Criar gráfico de barras de documentos pendentes por tipo
         const ctxDocumentos = document.getElementById('grafico-unidades').getContext('2d');
         const graficoDocumentos = new Chart(ctxDocumentos, {
@@ -347,18 +347,34 @@ fetch("{% url 'obrigatorios_por_unidade' %}")
                 responsive: true,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value; // Mantendo apenas o valor sem a unidade de porcentagem
+                            }
+                        }
                     }
                 },
                 plugins: {
-                    title: {
-                        display: true,
-                        text: titulo // Definir o título do gráfico
+                    datalabels: {
+                        color: '#000000',
+                        anchor: 'end',
+                        align: 'end',
+                        offset: 10, // Ajuste conforme necessário para mover os rótulos para cima
+                        formatter: function(value, context) {
+                            return value + '%'; // Adiciona porcentagem aos valores das barras
+                        }
                     }
+                },
+                title: {
+                    display: true,
+                    text: titulo // Definir o título do gráfico
                 }
             }
         });
-    
+    }
+
+
         // Adicionar evento de clique nas barras do gráfico de documentos
         ctxDocumentos.canvas.onclick = function(evt) {
             const activePoint = graficoDocumentos.getElementsAtEventForMode(evt, 'nearest', { intersect: true });
@@ -367,7 +383,7 @@ fetch("{% url 'obrigatorios_por_unidade' %}")
                 exibirDetalhesDocumento(index);
             }
         };
-    
+
         // Adicionar botão de voltar
         const backButton = document.createElement('button');
         backButton.textContent = 'Voltar';
@@ -381,7 +397,7 @@ fetch("{% url 'obrigatorios_por_unidade' %}")
         };
         document.getElementById('grafico-container').appendChild(backButton);
     }
-    
+
     // Função para exibir tabela de detalhes ao clicar em uma barra do gráfico de documentos
     function exibirDetalhesDocumento(index) {
     const documentoSelecionado = documentosData[index];
@@ -440,7 +456,7 @@ fetch("{% url 'obrigatorios_por_unidade' %}")
 
 
 
-    
+
         // Criar o modal
         const modal = document.createElement('div');
         modal.classList.add('modal');
@@ -451,10 +467,10 @@ fetch("{% url 'obrigatorios_por_unidade' %}")
             </div>
         `;
         document.body.appendChild(modal);
-    
+
         // Exibir o modal
         modal.style.display = 'block';
-    
+
         // Fechar o modal ao clicar no botão de fechar (×) ou fora da janela modal
         const closeButton = modal.querySelector('.close');
         window.onclick = function(event) {
@@ -466,19 +482,19 @@ fetch("{% url 'obrigatorios_por_unidade' %}")
             modal.remove();
         }
     }
-    
+
     // Função para buscar os dados da view TotalColaboradoresView e exibir os gráficos quando a página carregar
     window.onload = function() {
         getTotalColaboradores();
         exibirGraficosAtivos();
     };
-    
+
     // Função para buscar os dados da view TotalColaboradoresView
     async function getTotalColaboradores() {
         try {
             const response = await fetch("{% url 'total_colaboradores' %}");
             const data = await response.json();
-    
+
             // Atualizar o texto dos botões com as quantidades de ativos e inativos
             document.getElementById('total-ativos').textContent = data.total_ativos;
             document.getElementById('total-inativos').textContent = data.total_inativos;
@@ -528,7 +544,7 @@ fetch("{% url 'obrigatorios_por_unidade' %}")
                 console.log('Erro ao carregar os dados para ativos');
             }
         });
-        
+
 
         fetch("{% url 'obrigatorios_inativos_unid' %}")
             .then(response => response.json())
@@ -541,7 +557,7 @@ fetch("{% url 'obrigatorios_por_unidade' %}")
                 const totalPendentesPorcentagem = totalPendentes.map(value => (value / totalMax) * 100);
 
                 const ctxUnidades = document.getElementById('grafico-unidades').getContext('2d');
-                
+
                 // Destruir o gráfico anterior, se existir
                 if (typeof graficoUnidades !== 'undefined') {
                     graficoUnidades.destroy();
@@ -596,14 +612,14 @@ fetch("{% url 'obrigatorios_por_unidade' %}")
             })
             .catch(error => console.error('Erro ao carregar dados:', error));
     }
-    
- 
+
+
 </script>
 
-    
 
 
-   
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>

@@ -329,7 +329,7 @@ class Migration(migrations.Migration):
                 ('nome', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='documento.colaborador')),
                 ('empresa', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='documento.empresa')),
                 ('regional', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='documento.regional')),
-                ('situacao', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='documento.situacao')),
+                ('situacao', models.CharField(max_length=255)),
                 ('tipo_documento', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='documento.tipodocumento')),
                 ('unidade', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='documento.unidade')),
             ],

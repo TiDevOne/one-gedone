@@ -7,11 +7,7 @@
 <link rel="stylesheet" href='{% static "\bootstrap\css\configuracao.css" %}'>
 {% endblock %}
 
-
-
-
 {% block content %}
-
 
 <form method="post">
   {% csrf_token %}
@@ -54,6 +50,29 @@
                     </h1>
                 </a>
             </li>
+<script>
+    $(document).ready(function() {
+    $('.item-menu[data-target="RessincronizarForm"]').click(function(e) {
+        e.preventDefault();  // Impede o comportamento padrão do link
+
+        $.ajax({
+            url: "{% url 'documentos_vencidos' %}",  // URL que você definiu para a view
+            type: 'GET',  // Tipo da requisição
+            success: function(response) {
+                console.log('Documentos processados: ', response.documentos_processados);
+                alert('Documentos processados: ' + response.documentos_processados);
+            },
+            error: function(xhr, status, error) {
+                console.error('Erro ao ressincronizar:', error);
+                alert('Erro ao ressincronizar: ' + error);
+            }
+        });
+    });
+});
+
+</script>
+
+
             <li class="item-menu" data-target="AtualizarBancoForm">
                 <a href="#">
                     <h1>
@@ -1530,9 +1549,6 @@ window.addEventListener('load', function() {
   });
 </script>
 
-
-
-
 <div id="tabelaTiposDocumentosForm" class="table-container">
   <table>
       <div>
@@ -1845,7 +1861,7 @@ function cadastrarTipoDocumento() {
     const pcd = document.getElementById('pcdSelect').value;
     const valor_legal = document.getElementById('valorLegalTipoDocumento').value;
     const verifica_assinatura = document.getElementById('VerificarAssTipoDocumento').value;
-    const auditoria = document.getElementById('AuditoriaTipoDocumento').value;
+    // const auditoria = document.getElementById('AuditoriaTipoDocumento').value;
     const validade = document.getElementById('ValidadeTipoDocumento').value;
     const tipo_validade = document.getElementById('TipoValidadeTipoDocumento').value;
     const exibe_relatorio = document.getElementById('ExibeRelatorioComplianceTipoDocumento').value;
@@ -1860,7 +1876,7 @@ function cadastrarTipoDocumento() {
     console.log('Valor de pcd recebido:', pcd);
     console.log('Valor de valor_legal recebido:', valor_legal);
     console.log('Valor de verifica_assinatura recebido:', verifica_assinatura);
-    console.log('Valor de auditoria recebido:', auditoria);
+    // console.log('Valor de auditoria recebido:', auditoria);
     console.log('Valor de validade recebido:', validade);
     console.log('Valor de tipo_validade recebido:', tipo_validade);
     console.log('Valor de exibe_relatorio recebido:', exibe_relatorio);
@@ -2714,7 +2730,7 @@ function getCookie(name) {
       }
   
       // Evento de clique para atualizar o ponto
-      document.getElementById('atualizarPonto').addEventListener('click', function() {
+      document.getElementById('sincronizarDocumentosBtn').addEventListener('click', function() {
           fetch("{% url 'atualizar_controle_ponto' %}", {  
               method: 'POST',
               headers: {
@@ -2738,7 +2754,7 @@ function getCookie(name) {
       });
   
       // Evento de clique para carregar documentos vencidos
-      document.getElementById('carregarDocumentosBtn').addEventListener('click', function() {
+      document.getElementById('sincronizarDocumentosBtn').addEventListener('click', function() {
           fetch("{% url 'lista_vencidos' %}")
           .then(response => {
               if (!response.ok) {
@@ -2762,7 +2778,7 @@ function getCookie(name) {
       });
   
       // Evento de clique para carregar documentos a vencer
-      document.getElementById('carregarDocumentosBtn1').addEventListener('click', function() {
+      document.getElementById('sincronizarDocumentosBtn').addEventListener('click', function() {
           fetch("{% url 'lista_a_vencer' %}")
           .then(response => {
               if (!response.ok) {
@@ -2794,31 +2810,7 @@ function getCookie(name) {
               document.getElementById('listaVencimento15').innerHTML = 'Erro ao carregar: ' + error.message;
           });
       });
-  
-      // Evento de clique para carregar documentos de auditoria
-      document.getElementById('carregarDocumentosAuditoriaBtn').addEventListener('click', function() {
-          fetch("{% url 'documentos_auditorias' %}", {
-              method: 'GET',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRFToken': getCookie('csrftoken')
-              }
-          })
-          .then(response => {
-              if (!response.ok) {
-                  throw new Error('Falha na rede com status: ' + response.status);
-              }
-              return response.json();
-          })
-          .then(data => {
-              document.getElementById('statusUpdateAuditoria').textContent = 'Documentos de auditoria processados: ' + data.documentos_processados;
-          })
-          .catch(error => {
-              console.error('Erro ao carregar documentos de auditoria:', error);
-              document.getElementById('statusUpdateAuditoria').textContent = 'Erro ao carregar: ' + error.message;
-          });
-      });
-  
+
       // Evento de clique para pesquisa de documentos existentes
       $('#searchForm').submit(function(event) {
           event.preventDefault();
@@ -2884,6 +2876,20 @@ function getCookie(name) {
       sincronizarDocumentos();
   });
   </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    var sincronizarBtn = document.getElementById('sincronizarDocumentosBtn');
+    if (sincronizarBtn) {
+        sincronizarBtn.addEventListener('click', function() {
+            // Código para sincronizar documentos
+            console.log('Sincronizando documentos...');
+        });
+    } else {
+        console.log('O botão de sincronizar documentos não foi encontrado.');
+    }
+});
+</script>
 
     <script src="{% static 'bootstrap/js/src/configuracao.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

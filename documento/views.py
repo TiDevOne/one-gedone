@@ -2,20 +2,17 @@ import pandas as pd
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from jsonschema import ValidationError
+from loguru import logger
 from openpyxl.utils import datetime
+from django.db import IntegrityError
 from .forms import ImportarUsuariosForm, PesquisaFuncionarioForm
 import secrets
 from .models import (Area, CartaoPontoInexistente, Regional, Unidade,
                      Cargo, TipoDocumentoCargo, Empresa)
-from .models import DocumentoVencido, ColaboradorTipoDocumento
+from .models import DocumentoVencido, ColaboradorTipoDocumento, RelatorioGerencial
 from django.views.generic import DetailView
-from .models import ControlePonto
 from django.views.generic import ListView
 from .models import PendenteASO
-from .models import DocumentoAuditoria
-from .models import DocumentoExistenteAuditoria
-from .models import RelatorioGerencial
-from .models import DocumentoExistente
 from .models import ImportUsuarioXLSX  # Importe o modelo ImportUsuarioXLSX
 from .forms import PasswordResetForm
 from .forms import ImportarDadosForm
@@ -23,7 +20,7 @@ from .queries import importar_dados, ServicoPendenteASO, ObterDocumentosPendente
     calcular_porcentagens_documentos_obrigatorios_ativos, calcular_porcentagens_documentos_obrigatorios_inativos, \
     ServicoPonto, calcular_porcentagens_ponto_ativos, calcular_porcentagens_ponto_inativos, \
     calcular_porcentagens_obrigatorios_unidade_ativos, DocumentoVencidoService, ServicoValidadeDocumento, \
-    ServicoDocumentoAuditoria, calcular_porcentagens_obrigatorios_unidade_inativos, documentos_a_vencer, \
+    calcular_porcentagens_obrigatorios_unidade_inativos, documentos_a_vencer, \
     DocumentoPendenciaQuery
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -35,7 +32,6 @@ from .models import GrupoDocumento
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.views import PasswordResetDoneView
-from django.contrib.auth.views import LogoutView
 from .models import DocumentoPendente
 from .forms import RelatoriosPendentesForm
 from .models import Situacao
@@ -48,6 +44,10 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from .models import Usuario
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.models import Group, Permission
+from django.forms.models import model_to_dict
+
 
 #  ********* VIEWS para MENUS SUPERIORES  ************
 # VIEW que INICIA o PROJETO
@@ -71,7 +71,6 @@ def dossie(request):
 @login_required
 def relatorios(request):
     return render(request, 'documento/relatorios.html')
-
 
 @login_required
 def configuracao(request):
@@ -313,42 +312,6 @@ def get_hyperlinkpdf_data(request):
     return JsonResponse({'hyperlinkpdf_data': hyperlinkpdf_data})
 
 
-"""def get_documentos_info(request):
-    tipos_documentos = TipoDocumento.objects.all().select_related('grupo_documento', 'hiperlink_documento')
-    data = []
-
-    for tipo in tipos_documentos:
-        documentos = Hyperlinkpdf.objects.filter(documento=tipo).select_related('colaborador', 'documento')
-        documentos_data = [{
-            'documento_nome': doc.documento.nome if doc.documento else 'Documento não especificado',
-            'colaborador_nome': doc.colaborador.nome if doc.colaborador else 'N/A',
-            'colaborador_id': doc.colaborador.id if doc.colaborador else 'N/A',
-            'caminho': doc.caminho,
-            'cpf': doc.cpf,
-            'matricula': doc.matricula
-        } for doc in documentos]
-
-        data.append({
-            'tipo_documento_id': tipo.id,
-            'codigo': tipo.codigo,
-            'nome': tipo.nome,
-            'grupo_documento': tipo.grupo_documento.nome if tipo.grupo_documento else 'N/A',
-            'pcd': tipo.pcd,
-            'obrigatorio': tipo.obrigatorio,
-            'valor_legal': tipo.valor_legal,
-            'verifica_assinatura': tipo.verifica_assinatura,
-            'auditoria': tipo.auditoria,
-            'validade': tipo.validade,
-            'tipo_validade': tipo.tipo_validade,
-            'exibe_relatorio': tipo.exibe_relatorio,
-            'lista_situacao': tipo.lista_situacao,
-            'prioridade': tipo.prioridade,
-            'hiperlink_documento_id': tipo.hiperlink_documento.id if tipo.hiperlink_documento else 'N/A',
-            'documentos': documentos_data
-        })
-
-    return JsonResponse(data, safe=False)"""
-
 def get_documentos_info(request):
     # Recuperando todos os tipos de documentos e ordenando pelo campo 'codigo'
     tipos_documentos = TipoDocumento.objects.all().select_related('grupo_documento', 'hiperlink_documento').order_by('codigo')
@@ -357,13 +320,22 @@ def get_documentos_info(request):
 
     for tipo in tipos_documentos:
         documentos = Hyperlinkpdf.objects.filter(documento=tipo).select_related('colaborador', 'documento')
+
+        # Verificar se o Kit Admissional está presente para o colaborador
+        kit_admissional_presente = Hyperlinkpdf.objects.filter(
+            colaborador__in=[doc.colaborador for doc in documentos],
+            documento__codigo='146'
+        ).exists()
+
         documentos_data = [{
             'documento_nome': doc.documento.nome if doc.documento else 'Documento não especificado',
             'colaborador_nome': doc.colaborador.nome if doc.colaborador else 'N/A',
             'colaborador_id': doc.colaborador.id if doc.colaborador else 'N/A',
             'caminho': doc.caminho,
             'cpf': doc.cpf,
-            'matricula': doc.matricula
+            'matricula': doc.matricula,
+            # Aplica a regra do Kit Admissional
+            'obrigatorio': False if kit_admissional_presente else tipo.obrigatorio
         } for doc in documentos]
 
         data.append({
@@ -469,16 +441,19 @@ class AtualizarDocumentosPendentesView(View):
         return JsonResponse({'status': 'Atualização concluída com sucesso!'})
 
 
+# Configura o logger
+# logger = logging.getLogger(__name__)
+
+
 class ObrigatoriosPorUnidadeAtivo(View):
     def get(self, request):
-        # Considerando que o modelo possui os campos corretos conforme a imagem e o modelo fornecidos anteriormente
         documentos_obrigatorios = (
             DocumentoPendente.objects
             .filter(obrigatorio=True, desligamento__isnull=True)  # Filtra apenas colaboradores ativos
             .select_related('unidade', 'tipo_documento', 'nome', 'unidade__regional', 'cargo')
             .values(
                 'unidade__nome',
-                'regional__nome',
+                'unidade__regional__nome',
                 'tipo_documento__nome',
                 'nome__nome',
                 'nome__matricula',
@@ -490,27 +465,34 @@ class ObrigatoriosPorUnidadeAtivo(View):
             .order_by('unidade__nome', 'tipo_documento__nome')
         )
 
+        # logger.info("Documentos obrigatórios carregados.")
+
         obrigatorios_por_unidade = {}
         for documento in documentos_obrigatorios:
             unidade_nome = documento['unidade__nome']
+            regional_nome = documento['unidade__regional__nome']
             tipo_documento_nome = documento['tipo_documento__nome']
+            # logger.info(f"Processando documento: Unidade={unidade_nome}, Regional={regional_nome}, Tipo de Documento={tipo_documento_nome}")
 
             if unidade_nome not in obrigatorios_por_unidade:
                 obrigatorios_por_unidade[unidade_nome] = {
-                    'regional': documento['regional__nome'],
+                    'regional': regional_nome,
                     'documentos': {},
                 }
+                # logger.info(f"Adicionado nova unidade: {unidade_nome} com regional {regional_nome}")
 
             if tipo_documento_nome not in obrigatorios_por_unidade[unidade_nome]['documentos']:
                 obrigatorios_por_unidade[unidade_nome]['documentos'][tipo_documento_nome] = {
                     'quantidade': 0,
                     'colaboradores': []
                 }
-
+                # logger.info(f"Adicionado novo tipo de documento: {tipo_documento_nome} em {unidade_nome}")
 
             documento_info = obrigatorios_por_unidade[unidade_nome]['documentos'][tipo_documento_nome]
             documento_info['quantidade'] += documento['quantidade']
             documento_info['colaboradores'].append({
+                'regional': documento['unidade__regional__nome'],
+                'unidade': documento['unidade__nome'],
                 'cargo': documento['cargo__nome'],
                 'nome': documento['nome__nome'],
                 'matricula': documento['nome__matricula'],
@@ -518,12 +500,17 @@ class ObrigatoriosPorUnidadeAtivo(View):
                 'admissao': documento['admissao']
             })
 
-        # Adicionando a contagem total de pendências
+        # Calcula o total de pendências por unidade
         for unidade_info in obrigatorios_por_unidade.values():
             total_pendentes = sum(doc_info['quantidade'] for doc_info in unidade_info['documentos'].values())
             unidade_info['total_pendentes'] = total_pendentes
-        lista_unidades = [
-            {
+            # logger.info(f"Total pendentes em {unidade_info['regional']}: {unidade_info['total_pendentes']}")
+
+        # Prepara a lista de unidades para resposta JSON
+        lista_unidades = []
+        for unidade, info in obrigatorios_por_unidade.items():
+            # logger.info(f"Montando lista para: Unidade={unidade}, Regional={info['regional']}")
+            unidade_dict = {
                 'regional': info['regional'],
                 'unidade': unidade,
                 'total_pendentes': info['total_pendentes'],
@@ -536,8 +523,9 @@ class ObrigatoriosPorUnidadeAtivo(View):
                     for doc_tipo, doc_info in info['documentos'].items()
                 ]
             }
-            for unidade, info in obrigatorios_por_unidade.items()
-        ]
+            lista_unidades.append(unidade_dict)
+
+        # logger.info(f"Lista final de unidades e pendências: {lista_unidades}")
 
         return JsonResponse(lista_unidades, safe=False)
 
@@ -581,6 +569,7 @@ class ObrigatoriosPorUnidadeInativo(View):
             documento_info = obrigatorios_por_unidade[unidade_nome]['documentos'][tipo_documento_nome]
             documento_info['quantidade'] += documento['quantidade']
             documento_info['colaboradores'].append({
+                'regional': documento['unidade__regional__nome'],
                 'unidade': unidade_nome,  # Adicionar o nome da unidade
                 'cargo': documento['cargo__nome'],
                 'nome': documento['nome__nome'],
@@ -609,6 +598,7 @@ class ObrigatoriosPorUnidadeInativo(View):
             }
             for unidade, info in obrigatorios_por_unidade.items()
         ]
+        # logger.info(f"Lista final de unidades e pendências: {lista_unidades}")
         return JsonResponse(lista_unidades, safe=False)
 
 
@@ -667,23 +657,87 @@ class DocumentosExistentesView(ListView):
 class CarregarDocumentosVencidosView(View):
     def get(self, request, *args, **kwargs):
         documentos = DocumentoVencidoService.copiar_documentos_relevantes()
+        # logger.info('Os documentos: %s', documentos)
         return JsonResponse(documentos, safe=False)
 
-def listar_documentos_vencidos(request):
-    documentos_vencidos = ServicoValidadeDocumento.documentos_vencidos()
-    # data = [{'id': doc.id, 'matricula': doc.matricula, 'data_vencimento': doc.dta_documento} for doc in documentos_vencidos]
-    return JsonResponse(documentos_vencidos, safe=False)
 
-def listar_documentos_a_vencer(request):
-    documentos_a_vencer = documentos_a_vencer()
-    return JsonResponse(documentos_a_vencer, safe=False)
+from django.utils import timezone
+
+class ListarDocumentosVencidosView(View):
+    def get(self, request):
+        try:
+            # Coletando apenas os documentos cuja data de vencimento já passou
+            documentos = DocumentoVencido.objects.filter(
+                data_vencimento__lte=timezone.now()  # Filtra para incluir apenas documentos vencidos
+            ).select_related(
+                'empresa',
+                'regional',
+                'unidade',
+                'colaborador',
+                'cargo',
+                'tipo_documento'
+            )
+
+            # Convertendo documentos para JSON
+            data = []
+            for doc in documentos:
+                doc_dict = model_to_dict(doc, exclude=['id'])
+                doc_dict.update({
+                    'empresa': doc.empresa.nome if doc.empresa else '',
+                    'regional': doc.regional.nome if doc.regional else '',
+                    'unidade': doc.unidade.nome if doc.unidade else '',
+                    'colaborador': doc.colaborador.nome if doc.colaborador else '',
+                    'cargo': doc.cargo.nome if doc.cargo else '',
+                    'tipo_documento': doc.tipo_documento.nome if doc.tipo_documento else '',
+                    'situacao': doc.situacao.descricao if hasattr(doc, 'situacao') and doc.situacao else 'Não Definido',
+                    'admissao': doc.colaborador.admissao.strftime('%d/%m/%Y') if doc.colaborador.admissao else 'Não Definido',
+                    'desligamento': doc.colaborador.desligamento.strftime('%d/%m/%Y') if doc.colaborador.desligamento else 'Não Definido',
+                    'obrigatorio': 'Sim' if doc.tipo_documento.obrigatorio else 'Não',
+                    'dta_documento': doc.dta_documento.strftime('%d/%m/%Y') if doc.dta_documento else 'Não Definido',
+                    'data_vencimento': doc.data_vencimento.strftime('%d/%m/%Y') if doc.data_vencimento else 'Não Definido'
+                })
+                data.append(doc_dict)
+                # Logando detalhes do documento
+                # logger.info(f'Documento processado: {doc_dict}')
+
+            return JsonResponse(data, safe=False)
+        except Exception as e:
+            logger.error('Erro ao listar documentos vencidos: %s', e)
+            return JsonResponse({'error': 'Não foi possível recuperar os documentos vencidos'}, status=500)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class CarregarDocumentosAuditoriaView(View):
-    def get(self, request, *args, **kwargs):
-        documentos = ServicoDocumentoAuditoria.carregar_documentos_auditoria()
-        return JsonResponse(documentos, safe=False)
+
+# Configure o logger para o seu módulo ou app
+# logger = logging.getLogger('documento')
+
+class ListarDocumentosaVencerView(View):
+    def get(self, request):
+        try:
+            # Coletando todos os documentos ativos
+            documentos = DocumentoVencido.objects.select_related(
+                'empresa',
+                'regional',
+                'unidade',
+                'colaborador',
+                'cargo',
+                'tipo_documento'
+            ).all()  # Removido filtro de documentos já vencidos
+
+            # Chamando a função para calcular os documentos a vencer
+            vencimentos = documentos_a_vencer(documentos)
+
+            # Preparando dados para resposta
+            data = []
+            for periodo, docs in vencimentos.items():
+                for doc in docs:
+                    data.append(
+                        doc)  # Adicionando cada documento diretamente, já que 'documentos_a_vencer' retorna em formato JSON adequado
+
+            return JsonResponse(data, safe=False)
+        except Exception as e:
+            logger.error('Erro ao listar documentos a vencer: %s', e)
+            return JsonResponse({'error': 'Não foi possível recuperar os documentos a vencer'}, status=500)
+
 
 # ************* Views que carregam os dados dos relatórios ************
 
@@ -794,7 +848,10 @@ class ListarCartaoPontoInexistenteView(View):
                 'regional': cartao.regional.nome if cartao.regional else 'N/A',
                 'unidade': cartao.unidade.nome if cartao.unidade else 'N/A',
                 'colaborador': cartao.colaborador.nome if cartao.colaborador else 'N/A',
-                'matricula': cartao.colaborador.matricula if cartao.colaborador else 'N/A',  # Adicionando a matrícula do colaborador
+                'matricula': cartao.colaborador.matricula if cartao.colaborador else 'N/A',
+                'cpf': cartao.colaborador.cpf if cartao.colaborador else 'N/A',
+                'admissao': cartao.colaborador.admissao.strftime('%d/%m/%Y') if cartao.colaborador and cartao.colaborador.admissao else 'N/A',
+                'desligamento': cartao.colaborador.desligamento.strftime('%d/%m/%Y') if cartao.colaborador and cartao.colaborador.desligamento else 'N/A',
                 'data': cartao.data.strftime('%d/%m/%Y') if cartao.data else 'N/A',
                 'existente': 'Sim' if cartao.existente else 'Não',
                 'status': cartao.status.nome if cartao.status else 'N/A'
@@ -803,6 +860,7 @@ class ListarCartaoPontoInexistenteView(View):
 
         return JsonResponse(serialized_cartoes, safe=False)
 
+
 def buscar_pendencias(request):
     data_escolhida = request.GET.get('data', None)
     if data_escolhida:
@@ -810,6 +868,8 @@ def buscar_pendencias(request):
         return JsonResponse(resultado)
     else:
         return JsonResponse({'error': 'Data não especificada'}, status=400)
+
+
 # ***************       Views que apresentam o html do relatório ++++++++++++++++++++++++
 
 
@@ -860,7 +920,6 @@ class DocumentosPendentesInativosPorUnidadeView(View):
         ).values('tipo_documento_nome', 'nomenome', 'nome_matricula').distinct()
         dados = list(documentos_pendentes)
         return JsonResponse({'dados': dados})
-
 
 
 class RelatorioPendenteView(View):
@@ -963,7 +1022,7 @@ class DocumentoExistenteListView(ListView):
         get_queryset (request): Retorna um QuerySet que será usado para carregar os dados.
     """
 
-    model = DocumentoExistente
+    model = Hyperlinkpdf
     template_name = "documento/relatorios.html"
     context_object_name = "documentos_existentes"
 
@@ -1351,114 +1410,6 @@ class DocumentoAVencerListView(ListView):
         return queryset
 
 
-class DocumentoAuditoriaListView(ListView):
-    """
-    Exibe a lista de documentos de auditoria.
-
-    Atributos:
-        model (Model): Modelo que será usado para carregar os dados (DocumentoAuditoria).
-        template_name (str): Caminho para o template HTML que será usado para renderizar a view.
-        context_object_name (str): Nome do objeto que será passado para o template.
-
-    Métodos:
-        get_queryset (request): Retorna um QuerySet que será usado para carregar os dados.
-    """
-
-    model = DocumentoAuditoria
-    template_name = "documento/relatorios.html"
-    context_object_name = "documentos_auditoria"
-
-    def get_queryset(self, request):
-        """
-        Filtra os documentos de auditoria por número, data, tipo, título e descrição.
-
-        Argumentos:
-            request: Objeto HttpRequest que contém informações sobre a requisição.
-
-        Retorno:
-            QuerySet: QuerySet filtrado com os documentos de auditoria.
-        """
-
-        queryset = super().get_queryset(request)
-
-        numero = request.GET.get("numero")
-        data = request.GET.get("data")
-        tipo = request.GET.get("tipo")
-        titulo = request.GET.get("titulo")
-        descricao = request.GET.get("descricao")
-
-        if numero:
-            queryset = queryset.filter(numero__icontains=numero)
-
-        if data:
-            queryset = queryset.filter(data__gte=data)
-
-        if tipo:
-            queryset = queryset.filter(tipo=tipo)
-
-        if titulo:
-            queryset = queryset.filter(titulo__icontains=titulo)
-
-        if descricao:
-            queryset = queryset.filter(descricao__icontains=descricao)
-
-        return queryset
-
-
-class DocumentoExistenteAuditoriaListView(ListView):
-    """
-    Exibe a lista de documentos existentes de auditorias.
-
-    Atributos:
-        model (Model): Modelo que será usado para carregar os dados (DocumentoExistenteAuditoria).
-        template_name (str): Caminho para o template HTML que será usado para renderizar a view.
-        context_object_name (str): Nome do objeto que será passado para o template.
-
-    Métodos:
-        get_queryset (request): Retorna um QuerySet que será usado para carregar os dados.
-    """
-
-    model = DocumentoExistenteAuditoria
-    template_name = "documento/relatorios.html"
-    context_object_name = "documentos_existentes_auditoria"
-
-    def get_queryset(self, request):
-        """
-        Filtra os documentos existentes de auditorias por número, data, tipo, título e descrição.
-
-        Argumentos:
-            request: Objeto HttpRequest que contém informações sobre a requisição.
-
-        Retorno:
-            QuerySet: QuerySet filtrado com os documentos existentes de auditorias.
-        """
-
-        queryset = super().get_queryset(request)
-
-        numero = request.GET.get("numero")
-        data = request.GET.get("data")
-        tipo = request.GET.get("tipo")
-        titulo = request.GET.get("titulo")
-        descricao = request.GET.get("descricao")
-
-        if numero:
-            queryset = queryset.filter(numero__icontains=numero)
-
-        if data:
-            queryset = queryset.filter(data__gte=data)
-
-        if tipo:
-            queryset = queryset.filter(tipo=tipo)
-
-        if titulo:
-            queryset = queryset.filter(titulo__icontains=titulo)
-
-        if descricao:
-            queryset = queryset.filter(descricao__icontains=descricao)
-
-        return queryset
-
-
 class RelatorioGerencialListView(ListView):
     """
     Exibe a lista de relatórios gerenciais.
@@ -1509,75 +1460,242 @@ class RelatorioGerencialListView(ListView):
         return queryset
 
 
+def domingos_feriados_existente(request):
+    if request.method == 'GET':
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            empresa_id = request.GET.get('empresa_id')
+            if empresa_id:
+                regionais = Regional.objects.filter(empresa_id=empresa_id).values('id', 'nome')
+                logger.info(f'Regionais para empresa {empresa_id}: {list(regionais)}')
+            else:
+                regionais = Regional.objects.all().values('id', 'nome')
+                logger.info('Todas as regionais: {}'.format(list(regionais)))
+            return JsonResponse(list(regionais), safe=False)
+
+        form = PesquisaDomingosFeriadosForm(request.GET)
+        if form.is_valid():
+            documentos = DomingosFeriados.objects.all()
+            if form.cleaned_data['empresa']:
+                documentos = documentos.filter(empresa_id=form.cleaned_data['empresa'])
+                logger.info(f'Documentos filtrados por empresa {form.cleaned_data["empresa"]}')
+            if form.cleaned_data['regional']:
+                documentos = documentos.filter(empresa__regional_id=form.cleaned_data['regional'])
+                logger.info(f'Documentos filtrados por regional {form.cleaned_data["regional"]}')
+            data = serializers.serialize('json', documentos)
+            return JsonResponse(data, safe=False)
+
+        logger.error('Formulário inválido')
+        return JsonResponse({'error': 'Invalid form data'}, status=400)
+
+    empresas = Empresa.objects.all()
+    regionais = Regional.objects.all()
+    logger.info(f'Carregando empresas: {list(empresas.values("id", "nome"))}')
+    logger.info(f'Carregando regionais: {list(regionais.values("id", "nome"))}')
+    context = {'empresas': empresas, 'regionais': regionais}
+    return render(request, 'documento/relatorios.html', context)
 
 
-class ControlePontoListView(ListView):
-    """
-    Exibe a lista de pontos do colaborador.
 
-    Atributos:
-        model (Model): Modelo que será usado para carregar os dados (ControlePonto).
-        template_name (str): Caminho para o template HTML que será usado para renderizar a view.
-        context_object_name (str): Nome do objeto que será passado para o template.
+# **********   Views para a aba de Configurações **********
 
-    Métodos:
-        get_queryset (request): Retorna um QuerySet que será usado para carregar os dados.
-    """
-
-    model = ControlePonto
-    template_name = "documento/relatorios.html"
-    context_object_name = "pontos"
-
-    def get_queryset(self, request):
-        """
-        Filtra os pontos por regional, unidade, nome do colaborador, matrícula, data, hora de entrada, hora de saída e justificativa.
-
-        Argumentos:
-            request: Objeto HttpRequest que contém informações sobre a requisição.
-
-        Retorno:
-            QuerySet: QuerySet filtrado com os pontos.
-        """
-
-        queryset = super().get_queryset(request)
-
-        regional = request.GET.get("regional")
-        unidade = request.GET.get("unidade")
-        nome_colaborador = request.GET.get("nome")
-        matricula = request.GET.get("matricula")
-        data = request.GET.get("data")
-        hora_entrada = request.GET.get("hora_entrada")
-        hora_saida = request.GET.get("hora_saida")
-        justificativa = request.GET.get("justificativa")
-
-        if regional:
-            queryset = queryset.filter(regional=regional)
-
-        if unidade:
-            queryset = queryset.filter(unidade=unidade)
-
-        if nome_colaborador:
-            queryset = queryset.filter(nome_colaborador__icontains=nome_colaborador)
-
-        if matricula:
-            queryset = queryset.filter(matricula=matricula)
-
-        if data:
-            queryset = queryset.filter(data=data)
-
-        if hora_entrada:
-            queryset = queryset.filter(hora_entrada__gte=hora_entrada)
-
-        if hora_saida:
-            queryset = queryset.filter(hora_saida__lte=hora_saida)
-
-        if justificativa:
-            queryset = queryset.filter(justificativa__icontains=justificativa)
-
-        return queryset
+@csrf_exempt
+def gerenciar_colaborador(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        if 'excluir' in data:
+            colaborador_id = data.get('id')
+            colaborador = Colaborador.objects.get(id=colaborador_id)
+            colaborador.delete()
+            return HttpResponse(status=204)
+        else:
+            colaborador_id = data.get('id', None)
+            if colaborador_id:
+                colaborador = Colaborador.objects.get(id=colaborador_id)
+                # Atualiza os campos do colaborador com os novos valores recebidos
+                colaborador.nome = data.get('nome', colaborador.nome)
+                colaborador.matricula = data.get('matricula', colaborador.matricula)
+                colaborador.cpf = data.get('cpf', colaborador.cpf)
+                colaborador.cargo_id = data.get('cargo_id', colaborador.cargo_id)
+                colaborador.status_id = data.get('status_id', colaborador.status_id)
+                colaborador.admissao = data.get('admissao', colaborador.admissao)
+                colaborador.desligamento = data.get('desligamento', colaborador.desligamento)
+                colaborador.email = data.get('email', colaborador.email)
+                colaborador.pcd = data.get('pcd', colaborador.pcd)
+                colaborador.save()
+                return JsonResponse({'status': 'success', 'message': 'Colaborador atualizado com sucesso'})
+            else:
+                # Cria um novo colaborador
+                novo_colaborador = Colaborador.objects.create(
+                    nome=data['nome'],
+                    matricula=data['matricula'],
+                    cpf=data['cpf'],
+                    cargo_id=data['cargo_id'],
+                    status_id=data['status_id'],
+                    admissao=data['admissao'],
+                    desligamento=data.get('desligamento'),
+                    email=data.get('email'),
+                    pcd=data['pcd']
+                )
+                return JsonResponse({'status': 'success', 'message': 'Colaborador criado com sucesso'})
+    elif request.method == 'GET':
+        colaboradores = Colaborador.objects.all().values(
+            'id', 'nome', 'matricula', 'cpf', 'cargo__descricao', 'status__descricao',
+            'admissao', 'desligamento', 'email', 'pcd'
+        )
+        return JsonResponse(list(colaboradores), safe=False)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
 
 
-# ********** Views para a aba de Configurações**********
+@csrf_exempt
+def gerenciar_empresa(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        empresa_id = data.get('id', None)
+        nome_empresa = data.get('nome', '')
+
+        if 'excluir' in data and empresa_id:
+            # Processa a exclusão da empresa
+            try:
+                empresa = Empresa.objects.get(id=empresa_id)
+                empresa.delete()
+                return HttpResponse(status=204)
+            except Empresa.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Empresa não encontrada'}, status=404)
+
+        if empresa_id:
+            # Edita uma empresa existente
+            try:
+                empresa = Empresa.objects.get(id=empresa_id)
+                empresa.nome = nome_empresa
+                empresa.save()
+                return JsonResponse({'status': 'success', 'message': 'Empresa atualizada com sucesso'})
+            except Empresa.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Empresa não encontrada'}, status=404)
+        else:
+            # Cria uma nova empresa
+            try:
+                if Empresa.objects.filter(nome=nome_empresa).exists():
+                    return JsonResponse({'status': 'error', 'message': 'Uma empresa com esse nome já existe'}, status=400)
+                nova_empresa = Empresa(nome=nome_empresa)
+                nova_empresa.save()
+                return JsonResponse({'status': 'success', 'message': 'Empresa cadastrada com sucesso'})
+            except IntegrityError as e:
+                return JsonResponse({'status': 'error', 'message': f'Erro de integridade ao salvar a empresa: {str(e)}'}, status=500)
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': f'Erro ao cadastrar empresa: {str(e)}'}, status=500)
+    elif request.method == 'GET':
+        empresas = Empresa.objects.all().values('id', 'nome')
+        return JsonResponse(list(empresas), safe=False)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
+
+
+
+@csrf_exempt
+def gerenciar_regional(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        regional_id = data.get('id', None)
+        nome_regional = data.get('nome', '')
+        empresa_id = data.get('empresa_id', None)
+
+        if 'excluir' in data and regional_id:
+            # Processa a exclusão da regional
+            try:
+                regional = Regional.objects.get(id=regional_id)
+                regional.delete()
+                return HttpResponse(status=204)
+            except Regional.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Regional não encontrada'}, status=404)
+
+        if regional_id:
+            # Edita uma regional existente
+            try:
+                regional = Regional.objects.get(id=regional_id)
+                regional.nome = nome_regional
+                if empresa_id:
+                    regional.empresa_id = empresa_id
+                regional.save()
+                return JsonResponse({'status': 'success', 'message': 'Regional atualizada com sucesso'})
+            except Regional.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Regional não encontrada'}, status=404)
+            except Empresa.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Empresa não encontrada'}, status=404)
+        else:
+            # Cria uma nova regional
+            try:
+                if empresa_id is None or not Empresa.objects.filter(id=empresa_id).exists():
+                    return JsonResponse({'status': 'error', 'message': 'Empresa fornecida não existe'}, status=400)
+                if Regional.objects.filter(nome=nome_regional, empresa_id=empresa_id).exists():
+                    return JsonResponse({'status': 'error', 'message': 'Uma regional com esse nome já existe nesta empresa'}, status=400)
+                nova_regional = Regional(nome=nome_regional, empresa_id=empresa_id)
+                nova_regional.save()
+                return JsonResponse({'status': 'success', 'message': 'Regional cadastrada com sucesso'})
+            except IntegrityError as e:
+                return JsonResponse({'status': 'error', 'message': f'Erro de integridade ao salvar a regional: {str(e)}'}, status=500)
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': f'Erro ao cadastrar regional: {str(e)}'}, status=500)
+    elif request.method == 'GET':
+        regionais = Regional.objects.select_related('empresa').all().values(
+            'id', 'nome', 'empresa__nome'
+        )
+        return JsonResponse(list(regionais), safe=False)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
+
+
+@csrf_exempt
+def gerenciar_unidade(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        unidade_id = data.get('id', None)
+        nome_unidade = data.get('nome', '')
+        regional_id = data.get('regional_id', None)
+
+        if 'excluir' in data and unidade_id:
+            # Processa a exclusão da unidade
+            try:
+                unidade = Unidade.objects.get(id=unidade_id)
+                unidade.delete()
+                return HttpResponse(status=204)
+            except Unidade.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Unidade não encontrada'}, status=404)
+
+        if unidade_id:
+            # Edita uma unidade existente
+            try:
+                unidade = Unidade.objects.get(id=unidade_id)
+                unidade.nome = nome_unidade
+                if regional_id:
+                    unidade.regional_id = regional_id
+                unidade.save()
+                return JsonResponse({'status': 'success', 'message': 'Unidade atualizada com sucesso'})
+            except Unidade.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Unidade não encontrada'}, status=404)
+            except Regional.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Regional não encontrada'}, status=404)
+        else:
+            # Cria uma nova unidade
+            try:
+                if regional_id is None or not Regional.objects.filter(id=regional_id).exists():
+                    return JsonResponse({'status': 'error', 'message': 'Regional fornecida não existe'}, status=400)
+                if Unidade.objects.filter(nome=nome_unidade, regional_id=regional_id).exists():
+                    return JsonResponse({'status': 'error', 'message': 'Uma unidade com esse nome já existe nesta regional'}, status=400)
+                nova_unidade = Unidade(nome=nome_unidade, regional_id=regional_id)
+                nova_unidade.save()
+                return JsonResponse({'status': 'success', 'message': 'Unidade cadastrada com sucesso'})
+            except IntegrityError as e:
+                return JsonResponse({'status': 'error', 'message': f'Erro de integridade ao salvar a unidade: {str(e)}'}, status=500)
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': f'Erro ao cadastrar unidade: {str(e)}'}, status=500)
+    elif request.method == 'GET':
+        unidades = Unidade.objects.select_related('regional').all().values(
+            'id', 'nome', 'regional__nome'
+        )
+        return JsonResponse(list(unidades), safe=False)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
 
 
 @csrf_exempt
@@ -1616,7 +1734,7 @@ def cadastrar_tipodocumento(request):
 
                     return JsonResponse({'status': 'success', 'message': 'Tipo de documento editado com sucesso'})
                 else:
-                    # Restante do código para criar um novo tipo de documento
+                    # Restante do código para criar um tipo de documento
                     # Função para converter valores "sim" e "nao" em True e False
                     def sim_nao_to_boolean(value):
                         return value.lower() == 'sim'
@@ -1667,7 +1785,7 @@ def cadastrar_tipodocumento(request):
                         )
 
 
-                    # Adicione os IDs dos cargos selecionados aos dados enviados na solicitação POST
+                    # Adicione os 'IDs' dos cargos selecionados aos dados enviados na solicitação POST
                     url_colaborador = request.build_absolute_uri(reverse('inserir_tipodocumento_colaborador'))
                     for cargo_id in cargos_selecionados:
                         response_colaborador = requests.post(
@@ -1850,12 +1968,11 @@ def cadastrar_area(request):
         return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
 
 
-
 class ImportarDadosView(View):
     template_name = 'documento/import_xlsx.html'
 
     def get(self, request):
-        form = ImportarDadosForm()
+        form = ImportarDadosForm()  # Cria uma instância do formulário
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
@@ -1865,11 +1982,14 @@ class ImportarDadosView(View):
             sucesso, mensagem = importar_dados(arquivo_csv)
             if sucesso:
                 messages.success(request, "Dados importados com sucesso.")
+                # Considerar um redirecionamento após o sucesso para evitar reenvio do formulário
+                return redirect('alguma_url_de_sucesso')
             else:
                 messages.error(request, mensagem)
-            # return redirect('alguma_url_de_sucesso')
         else:
             messages.error(request, "Erro no formulário.")
+
+        # Sempre retorne o formulário no contexto, independente se é uma submissão válida ou não
         return render(request, self.template_name, {'form': form})
 
 def importar_usuarios(request):
@@ -1916,25 +2036,37 @@ def lista_funcionarios(request):
 
 # ******* 'Login', autenticação com Banco de dados, Logut e criação de 'login' ***********
 # @login_required
+import logging
+
+# Configura o logger
+logger = logging.getLogger('django')
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(View):
-    def post(self, request: object) -> object:
-        # Obter os dados de login do corpo da requisição POST
+    def post(self, request):
         username = request.POST.get('username')
         password = request.POST.get('password')
-
-        # Autenticar o usuário
         user = authenticate(request, username=username, password=password)
 
-
         if user is not None:
-            # Se as credenciais forem válidas, faça o login
             login(request, user)
+            # logger.info(f'Usuário logado: {user.username}')
+
+            # Envia os dados do usuário como JSON para o frontend
+            response_data = {
+                'message': 'Login bem-sucedido',
+                'username': user.username
+            }
+
+            # print(request.POST)
+
+            # Redireciona o usuário para a tela de dashboard
             return redirect('dashboard')
-            # return JsonResponse({'message': 'Login bem-sucedido'})
         else:
-            # Se as credenciais forem inválidas, retorne uma resposta de erro
+            # logger.info(f'Tentativa de login falhou para o usuário: {username}')
             return JsonResponse({'error': 'Credenciais inválidas'}, status=400)
+
 
 class AuthenticationViews(View):
     def forgot_password(request):
@@ -1958,14 +2090,22 @@ class CustomPasswordResetDoneView(PasswordResetDoneView):
     template_name = 'documento/tela_login.html'
 
 
-class CustomLogoutView(LogoutView):
-    template_name = 'documento/tela_login.html'
+class CustomLogoutView(View):
+    def get(self, request, *args, **kwargs):
+        logger.info('GET request received for CustomLogoutView')
+        # Realize o logout do usuário (se necessário)
+        # logout(request)  # Se desejar realizar o logout
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-        request.session['user_logged_out'] = True
-        return response
+        # Redirecione o usuário para a tela de login
+        return redirect('tela_login')  # Corrigido para usar o nome da URL
+
+    def post(self, request, *args, **kwargs):
+        logger.info('POST request received for CustomLogoutView')
+        # Realize o logout do usuário (se necessário)
+        # logout(request)  # Se desejar realizar o logout
+
+        # Redirecione o usuário para a tela de login
+        return redirect('tela_login')  # Corrigido para usar o nome da URL
 
 
 class CheckUserLoggedOutMiddleware:
@@ -1974,7 +2114,7 @@ class CheckUserLoggedOutMiddleware:
 
     def __call__(self, request):
         if request.user.is_authenticated and request.session.get('user_logged_out'):
-            # Se o usuário tentar acessar uma página protegida após ter saído, redirecione para o login
+            # Se o usuário tentar acessar uma página protegida após ter saído, redirecione para o 'login'
             del request.session['user_logged_out']  # Remova o sinalizador
             return redirect(reverse('login'))
 
@@ -1982,37 +2122,104 @@ class CheckUserLoggedOutMiddleware:
         return response
 
 
-def cadastro_login(request):
+# User = get_user_model()
+
+@csrf_exempt
+def gerenciar_usuario(request):
     if request.method == 'POST':
-        # Coletar dados do formulário
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        is_superuser = request.POST.get('is_superuser') == 'on'
+        data = json.loads(request.body)
+        user_id = data.get('id', None)
 
-        # Verificar se o usuário já existe
-        if Usuario.objects.filter(username=username).exists():
-            messages.error(request, 'Este nome de usuário já está em uso.')
-            return redirect('cadastro_login')
+        if 'excluir' in data and user_id:
+            # Processa a exclusão do usuário
+            try:
+                usuario = User.objects.get(id=user_id)
+                usuario.delete()
+                return JsonResponse({'status': 'success', 'message': 'Usuário excluído com sucesso'})
+            except User.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Usuário não encontrado'}, status=404)
 
-        if is_superuser and not request.user.is_superuser:
-            messages.error(request, 'Você não tem permissão para criar um superusuário.')
-            return redirect('cadastro_login')
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+        is_superuser = data.get('is_superuser', False)
 
-        if is_superuser:
-            user = Usuario.objects.create_superuser(username=username, email=email, password=password)
+        if user_id:
+            # Edita um usuário existente
+            try:
+                usuario = User.objects.get(id=user_id)
+                usuario.username = username
+                usuario.email = email
+                if password:
+                    usuario.set_password(password)
+                usuario.is_superuser = is_superuser
+                usuario.save()
+                return JsonResponse({'status': 'success', 'message': 'Usuário atualizado com sucesso'})
+            except User.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Usuário não encontrado'}, status=404)
         else:
-            user = Usuario.objects.create_user(username=username, email=email, password=password)
+            # Cria um novo usuário
+            if User.objects.filter(username=username).exists():
+                return JsonResponse({'status': 'error', 'message': 'Este nome de usuário já está em uso'}, status=400)
+            if is_superuser and not request.user.is_superuser:
+                return JsonResponse({'status': 'error', 'message': 'Você não tem permissão para criar um superusuário'},
+                                    status=403)
+            user = User.objects.create_user(username=username, email=email, password=password,
+                                            is_superuser=is_superuser)
+            return JsonResponse({'status': 'success', 'message': 'Usuário criado com sucesso'})
+    elif request.method == 'GET':
+        # Listar usuários
+        usuarios = User.objects.all().values('id', 'username', 'email', 'is_superuser')
+        return JsonResponse(list(usuarios), safe=False)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
 
-        # Verificar se o usuário foi criado com sucesso
-        if user:
-            messages.success(request, 'Usuário criado com sucesso!')
-            # Se desejar, pode fazer login automaticamente após o cadastro
-            # login(request, user)
-            return redirect('login')  # Redirecionar para a página de login
-        else:
-            messages.error(request, 'Houve um problema ao criar o usuário. Por favor, tente novamente.')
 
-    # Se o método for GET ou se houver algum erro, renderizar o formulário de cadastro
-    return render(request, 'documento/configuracao.html', {})
+# Constantes para menus
+MENUS = [
+    {'nome': 'Dossiê', 'url': 'dossie'},
+    {'nome': 'Relatórios', 'url': 'relatorios'},
+    {'nome': 'Configuração', 'url': 'configuracao'},
+    {'nome': 'Dashboard', 'url': 'dashboard'},
+]
 
+@require_http_methods(["POST"])
+def criar_grupo_permissoes(request):
+    data = json.loads(request.body)
+    nome_grupo = data.get('nome_grupo')
+    codigo_grupo = data.get('codigo_grupo')  # Certifique-se de usar este campo conforme necessário
+    permissoes_ids = data.get('permissoes_ids', [])
+
+    grupo, created = Group.objects.get_or_create(name=nome_grupo)
+    if created:
+        grupo.permissions.set(Permission.objects.filter(id__in=permissoes_ids))
+        grupo.save()
+        return JsonResponse({'status': 'success', 'message': 'Grupo criado com sucesso!'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Grupo já existe'})
+
+def listar_empresas(request):
+    empresas = list(Empresa.objects.values('id', 'nome'))
+    return JsonResponse(empresas, safe=False)
+
+def listar_regionais(request):
+    regionais = list(Regional.objects.values('id', 'nome'))
+    return JsonResponse(regionais, safe=False)
+
+def listar_unidades(request):
+    unidades = list(Unidade.objects.values('id', 'nome'))
+    return JsonResponse(unidades, safe=False)
+
+def listar_permissoes(request):
+    permissoes = list(Permission.objects.all().values('id', 'name'))
+    return JsonResponse(permissoes, safe=False)
+
+
+def minha_visualizacao(request):
+    logger.debug('Esta é uma mensagem de log de depuração')
+    logger.info('Esta é uma mensagem de log de informação')
+    logger.warning('Esta é uma mensagem de log de aviso')
+    logger.error('Esta é uma mensagem de log de erro')
+    logger.critical('Esta é uma mensagem de log crítica')
+
+    return HttpResponse('OK')
